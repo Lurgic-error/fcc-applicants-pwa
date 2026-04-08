@@ -1,0 +1,392 @@
+@import '../../shared/design-system/tokens.css';
+/* Self-hosted fonts — place woff2 files in /public/fonts/ */
+/* Download from: https://fonts.google.com/specimen/Manrope and https://fonts.google.com/specimen/Outfit */
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Manrope Regular'), local('Manrope-Regular'), url('/fonts/manrope-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Manrope Medium'), local('Manrope-Medium'), url('/fonts/manrope-medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Manrope SemiBold'), local('Manrope-SemiBold'), url('/fonts/manrope-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Manrope Bold'), local('Manrope-Bold'), url('/fonts/manrope-bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Manrope';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: local('Manrope ExtraBold'), local('Manrope-ExtraBold'), url('/fonts/manrope-extrabold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: local('Outfit Medium'), local('Outfit-Medium'), url('/fonts/outfit-medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Outfit SemiBold'), local('Outfit-SemiBold'), url('/fonts/outfit-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Outfit Bold'), local('Outfit-Bold'), url('/fonts/outfit-bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: local('Outfit ExtraBold'), local('Outfit-ExtraBold'), url('/fonts/outfit-extrabold.woff2') format('woff2');
+}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --app-text: #0f172a;
+  --app-radius-panel: 16px;
+  --app-radius-soft: 12px;
+  --app-radius-compact: 10px;
+  --app-bg:
+    radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.16), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(15, 76, 129, 0.18), transparent 45%),
+    #f1f5f9;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --app-text: #e2e8f0;
+  --app-surface-1: #0f172a;
+  --app-surface-2: #0b1a36;
+  --app-surface-3: #1e293b;
+  --app-border: #334155;
+  --app-border-soft: #3f5170;
+  --app-bg:
+    radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.12), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(15, 76, 129, 0.2), transparent 45%),
+    #020617;
+
+  /* Element Plus palette tuning for softer portal dark mode */
+  --el-bg-color: var(--app-surface-1);
+  --el-bg-color-overlay: var(--app-surface-1);
+  --el-bg-color-page: #020617;
+  --el-fill-color-blank: #09101f;
+  --el-fill-color-light: var(--app-surface-3);
+  --el-fill-color-lighter: #2b3b55;
+  --el-fill-color-extra-light: #374964;
+  --el-border-color: var(--app-border);
+  --el-border-color-light: var(--app-border-soft);
+  --el-border-color-lighter: #334963;
+  --el-border-color-extra-light: #3f5170;
+  --el-text-color-primary: #e2e8f0;
+  --el-text-color-regular: #cbd5e1;
+  --el-text-color-secondary: #94a3b8;
+  --el-text-color-placeholder: #64748b;
+  --el-mask-color: rgba(2, 6, 23, 0.65);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  background: var(--app-bg);
+  color: var(--app-text);
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+html,
+body,
+#app {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+.rounded,
+.rounded-3xl,
+.rounded-2xl,
+.rounded-xl {
+  border-radius: var(--app-radius-panel) !important;
+}
+
+.rounded-sm,
+.rounded-lg,
+.rounded-md {
+  border-radius: var(--app-radius-soft) !important;
+}
+
+.rounded-xs {
+  border-radius: var(--app-radius-compact) !important;
+}
+
+.el-button,
+.el-input__wrapper,
+.el-select__wrapper,
+.el-textarea__inner,
+.el-card,
+.el-dialog,
+.el-drawer,
+.el-table,
+.el-tag,
+.el-alert,
+.el-message-box,
+.el-descriptions {
+  border-radius: var(--app-radius-soft);
+}
+
+.el-dialog,
+.el-drawer,
+.el-table {
+  overflow: hidden;
+}
+
+:root[data-theme='dark'] .text-slate-500 {
+  color: rgb(148 163 184 / var(--tw-text-opacity, 1));
+}
+
+:root[data-theme='dark'] .text-slate-600 {
+  color: rgb(203 213 225 / var(--tw-text-opacity, 1));
+}
+
+:root[data-theme='dark'] .text-slate-700 {
+  color: rgb(226 232 240 / var(--tw-text-opacity, 1));
+}
+
+:root[data-theme='dark'] .text-slate-800 {
+  color: rgb(226 232 240 / var(--tw-text-opacity, 1));
+}
+
+:root[data-theme='dark'] .text-slate-900 {
+  color: rgb(241 245 249 / var(--tw-text-opacity, 1));
+}
+
+:root[data-theme='dark'] .text-fcc-ink {
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] .border-slate-200 {
+  border-color: rgb(51 65 85 / var(--tw-border-opacity, 1));
+}
+
+:root[data-theme='dark'] .border-slate-300 {
+  border-color: rgb(71 85 105 / var(--tw-border-opacity, 1));
+}
+
+:root[data-theme='dark'] .bg-white {
+  background-color: rgb(15 23 42 / var(--tw-bg-opacity, 1));
+}
+
+:root[data-theme='dark'] .bg-white\/90 {
+  background-color: rgb(15 23 42 / 0.9);
+}
+
+:root[data-theme='dark'] .bg-white\/80 {
+  background-color: rgb(15 23 42 / 0.8);
+}
+
+:root[data-theme='dark'] .bg-slate-50 {
+  background-color: rgb(30 41 59 / var(--tw-bg-opacity, 1));
+}
+
+:root[data-theme='dark'] .bg-slate-100 {
+  background-color: rgb(30 41 59 / var(--tw-bg-opacity, 1));
+}
+
+:root[data-theme='dark'] .bg-slate-200 {
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1));
+}
+
+:root[data-theme='dark'] .bg-sky-50 {
+  background-color: rgb(12 74 110 / 0.35);
+}
+
+:root[data-theme='dark'] .shadow-sm,
+:root[data-theme='dark'] .shadow-panel {
+  --tw-shadow-color: rgba(2, 6, 23, 0.45);
+}
+
+:root[data-theme='dark'] .el-input__wrapper,
+:root[data-theme='dark'] .el-textarea__inner,
+:root[data-theme='dark'] .el-select__wrapper,
+:root[data-theme='dark'] .el-input-number,
+:root[data-theme='dark'] .el-date-editor.el-input__wrapper {
+  background-color: #0f1628;
+  box-shadow: 0 0 0 1px var(--app-border-soft) inset;
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] .el-input__wrapper.is-focus,
+:root[data-theme='dark'] .el-select__wrapper.is-focused,
+:root[data-theme='dark'] .el-textarea__inner:focus {
+  box-shadow:
+    0 0 0 1px #38bdf8 inset,
+    0 0 0 3px rgb(56 189 248 / 0.2);
+}
+
+:root[data-theme='dark'] .el-form-item__label,
+:root[data-theme='dark'] .el-radio__label,
+:root[data-theme='dark'] .el-checkbox__label {
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .el-table,
+:root[data-theme='dark'] .el-table__inner-wrapper,
+:root[data-theme='dark'] .el-table tr,
+:root[data-theme='dark'] .el-table__expanded-cell {
+  background-color: var(--app-surface-2);
+  color: #e2e8f0;
+}
+
+:root[data-theme='dark'] .el-table th.el-table__cell {
+  background-color: #1f2f4b;
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .el-table td.el-table__cell,
+:root[data-theme='dark'] .el-table th.el-table__cell.is-leaf {
+  border-bottom-color: #334963;
+}
+
+:root[data-theme='dark'] .el-table--border::after,
+:root[data-theme='dark'] .el-table--group::after,
+:root[data-theme='dark'] .el-table::before {
+  background-color: #334963;
+}
+
+:root[data-theme='dark'] .el-table--enable-row-hover .el-table__body tr:hover > td.el-table__cell {
+  background-color: #172641;
+}
+
+:root[data-theme='dark'] .el-table__empty-block,
+:root[data-theme='dark'] .el-empty__description p {
+  color: #94a3b8;
+}
+
+:root[data-theme='dark'] .el-tag.el-tag--info {
+  background-color: #1e293b;
+  border-color: #3f5170;
+  color: #cbd5e1;
+}
+
+:root[data-theme='dark'] .el-dropdown-menu,
+:root[data-theme='dark'] .el-select-dropdown {
+  background-color: var(--app-surface-1);
+  border-color: #334963;
+}
+
+:root[data-theme='dark'] .el-dropdown-menu__item,
+:root[data-theme='dark'] .el-select-dropdown__item {
+  color: #dbe7ff;
+}
+
+:root[data-theme='dark'] .el-dropdown-menu__item:not(.is-disabled):hover,
+:root[data-theme='dark'] .el-select-dropdown__item.hover,
+:root[data-theme='dark'] .el-select-dropdown__item:hover {
+  background-color: #1d2e4a;
+}
+
+:root[data-theme='dark'] .el-progress-bar__outer {
+  background-color: #1f2f4b;
+}
+
+:root[data-theme='dark'] a {
+  color: #38bdf8;
+}
+
+/* ── Semantic status colour overrides for dark mode ───────────────────── */
+
+:root[data-theme='dark'] .bg-emerald-100 {
+  background-color: rgba(22, 163, 74, 0.18);
+}
+:root[data-theme='dark'] .text-emerald-700 {
+  color: #86efac;
+}
+:root[data-theme='dark'] .border-emerald-200 {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+:root[data-theme='dark'] .bg-amber-100 {
+  background-color: rgba(217, 119, 6, 0.18);
+}
+:root[data-theme='dark'] .text-amber-800 {
+  color: #fcd34d;
+}
+:root[data-theme='dark'] .border-amber-200 {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+
+:root[data-theme='dark'] .bg-rose-100 {
+  background-color: rgba(220, 38, 38, 0.18);
+}
+:root[data-theme='dark'] .text-rose-700 {
+  color: #fca5a5;
+}
+:root[data-theme='dark'] .border-rose-200 {
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+:root[data-theme='dark'] .bg-sky-100 {
+  background-color: rgba(2, 132, 199, 0.18);
+}
+:root[data-theme='dark'] .text-sky-700 {
+  color: #7dd3fc;
+}
+:root[data-theme='dark'] .border-sky-200 {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+:root[data-theme='dark'] .bg-indigo-100 {
+  background-color: rgba(67, 56, 202, 0.18);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Outfit', sans-serif;
+}

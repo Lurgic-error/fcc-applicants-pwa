@@ -1,0 +1,37 @@
+{
+  "name": "fcc-applicants-pwa",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host --port 5070",
+    "build": "vite build",
+    "preview": "vite preview --host --port 5070",
+    "test:unit": "vitest run",
+    "test:unit:trademark-mvp": "vitest run src/services/__tests__/applicationCompleteness.test.js src/services/__tests__/applicantMappers.test.js src/services/__tests__/applicantJourney.test.js src/constants/__tests__/applicationServiceRules.test.js src/constants/__tests__/trademarkRecordation.test.js",
+    "test:unit:watch": "vitest",
+    "test:e2e": "cypress install && start-server-and-test \"VITE_APPLICANT_USE_MOCKS=true vite --host --port 5177\" http://127.0.0.1:5177 \"CYPRESS_baseUrl=http://127.0.0.1:5177 cypress run --e2e --spec cypress/e2e/applicant-portal.cy.js\""
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.2.0",
+    "axios": "^1.7.5",
+    "element-plus": "^2.13.6",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.7",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.29",
+    "vue-router": "^4.4.3",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.5",
+    "autoprefixer": "^10.4.21",
+    "cypress": "^13.12.0",
+    "postcss": "^8.5.6",
+    "start-server-and-test": "^2.0.4",
+    "tailwindcss": "^3.4.17",
+    "vite": "^5.3.1",
+    "vite-plugin-pwa": "^0.20.5",
+    "vitest": "^1.6.0"
+  }
+}
