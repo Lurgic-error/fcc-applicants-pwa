@@ -5,7 +5,7 @@ import ThemeSwitcher from '@/components/ThemeSwitcher.vue'
 
 const route = useRoute()
 const year = new Date().getFullYear()
-const isAuthPage = computed(() => route.name === 'login' || route.name === 'register')
+const isFullPage = computed(() => ['login', 'register', 'forgot-password', 'home'].includes(route.name))
 </script>
 
 <template>
@@ -16,30 +16,39 @@ const isAuthPage = computed(() => route.name === 'login' || route.name === 'regi
     >
       Skip to content
     </a>
-    <header role="banner" class="shrink-0 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
-        <router-link to="/" class="text-lg font-bold text-fcc-brand">FCC Applicants Portal</router-link>
-        <div class="flex items-center gap-2">
-          <ThemeSwitcher />
-          <el-button link class="dark:!text-slate-200" @click="$router.push('/auth/login')">Login</el-button>
-          <el-button type="primary" plain @click="$router.push('/auth/register')">Create Account</el-button>
+
+    <!-- Hide chrome on auth pages — let them own the full viewport -->
+    <template v-if="!isFullPage">
+      <header role="banner" class="shrink-0 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 md:px-6">
+          <router-link to="/" class="flex items-center gap-2.5">
+            <img src="@/assets/imgs/logo-2-removebg-preview.png" alt="Fair Competition Commission" class="fcc-seal h-10 w-auto" />
+            <span class="text-lg font-bold text-fcc-brand hidden sm:inline">Applicants Portal</span>
+          </router-link>
+          <div class="flex items-center gap-2">
+            <ThemeSwitcher />
+            <el-button link class="dark:!text-slate-200" @click="$router.push('/auth/login')">Login</el-button>
+            <el-button type="primary" plain @click="$router.push('/auth/register')">Create Account</el-button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </template>
 
     <main
       id="main-content"
-      class="mx-auto flex w-full max-w-6xl flex-1 px-4 py-8 md:px-6 md:py-10"
-      :class="isAuthPage ? 'items-center justify-center' : ''"
+      class="flex w-full flex-1"
+      :class="isFullPage ? '' : 'mx-auto max-w-6xl px-4 py-8 md:px-6 md:py-10'"
     >
       <router-view />
     </main>
 
-    <footer role="contentinfo" class="mt-auto shrink-0 border-t border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/70">
-      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 text-xs text-slate-600 dark:text-slate-300 md:px-6">
-        <span>Fair Competition Commission</span>
-        <span>{{ year }} FCC Applicants Portal</span>
-      </div>
-    </footer>
+    <template v-if="!isFullPage">
+      <footer role="contentinfo" class="mt-auto shrink-0 border-t border-slate-200 bg-white/70 dark:border-slate-800 dark:bg-slate-900/70">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 text-xs text-slate-600 dark:text-slate-300 md:px-6">
+          <span>Fair Competition Commission</span>
+          <span>&copy; {{ year }} FCC Applicants Portal</span>
+        </div>
+      </footer>
+    </template>
   </div>
 </template>

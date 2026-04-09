@@ -230,15 +230,15 @@ async function logout() {
                 <el-dropdown-item command="settings">Settings</el-dropdown-item>
                 <el-dropdown-item command="theme-system" divided>
                   Theme: System
-                  <span v-if="themeStore.preference === 'system'" class="ml-2 text-fcc-brand">✓</span>
+                  <i v-if="themeStore.preference === 'system'" class="fa-solid fa-check ml-2 text-fcc-brand text-xs" />
                 </el-dropdown-item>
                 <el-dropdown-item command="theme-light">
                   Theme: Light
-                  <span v-if="themeStore.preference === 'light'" class="ml-2 text-fcc-brand">✓</span>
+                  <i v-if="themeStore.preference === 'light'" class="fa-solid fa-check ml-2 text-fcc-brand text-xs" />
                 </el-dropdown-item>
                 <el-dropdown-item command="theme-dark">
                   Theme: Dark
-                  <span v-if="themeStore.preference === 'dark'" class="ml-2 text-fcc-brand">✓</span>
+                  <i v-if="themeStore.preference === 'dark'" class="fa-solid fa-check ml-2 text-fcc-brand text-xs" />
                 </el-dropdown-item>
                 <el-dropdown-item command="logout" divided>Logout</el-dropdown-item>
               </el-dropdown-menu>
@@ -265,6 +265,13 @@ async function logout() {
       "
     >
       <div class="h-full overflow-y-auto p-3 md:p-4">
+        <div class="mb-4 flex items-center gap-2.5 px-2">
+          <img src="@/assets/imgs/logo-2-removebg-preview.png" alt="FCC" class="fcc-seal h-10 w-auto shrink-0" />
+          <div class="min-w-0">
+            <p class="text-sm font-bold leading-tight text-fcc-ink dark:text-slate-100 truncate">Fair Competition</p>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Commission</p>
+          </div>
+        </div>
         <nav aria-label="Main navigation" class="space-y-2">
           <router-link
             v-for="link in navigationLinks"

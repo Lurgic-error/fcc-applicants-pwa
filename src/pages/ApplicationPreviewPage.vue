@@ -209,7 +209,7 @@ onMounted(async () => {
                   'text-red-400': section.status === 'empty'
                 }"
               >
-                {{ section.status === 'complete' ? '✓' : section.status === 'partial' ? '◐' : '○' }}
+                <i :class="section.status === 'complete' ? 'fa-solid fa-circle-check' : section.status === 'partial' ? 'fa-solid fa-circle-half-stroke' : 'fa-regular fa-circle'" />
               </span>
               <span class="flex-1 text-slate-900 dark:text-slate-100">{{ section.label }}</span>
               <span v-if="section.missingFields.length && isEditingMode" class="text-xs text-red-500">

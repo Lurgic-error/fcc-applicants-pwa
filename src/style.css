@@ -382,6 +382,14 @@ body,
   background-color: rgba(67, 56, 202, 0.18);
 }
 
+/* ── FCC seal logo — dark-mode treatment ────────────────────────────── */
+.fcc-seal {
+  transition: filter 180ms ease;
+}
+:root[data-theme='dark'] .fcc-seal {
+  filter: brightness(1.6) contrast(0.85);
+}
+
 h1,
 h2,
 h3,

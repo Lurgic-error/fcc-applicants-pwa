@@ -16,9 +16,9 @@ const completeness = computed(() =>
 )
 
 function statusIcon(status) {
-  if (status === 'complete') return '✓'
-  if (status === 'partial') return '◐'
-  return '○'
+  if (status === 'complete') return 'fa-solid fa-circle-check'
+  if (status === 'partial') return 'fa-solid fa-circle-half-stroke'
+  return 'fa-regular fa-circle'
 }
 
 function statusClasses(status) {
@@ -85,7 +85,7 @@ function missingLabel(section) {
                 @click="emit('jump-to-step', section.stepIndex)"
               >
                 <span class="flex h-5 w-5 shrink-0 items-center justify-center text-sm" :class="iconColor(section.status)">
-                  {{ statusIcon(section.status) }}
+                  <i :class="statusIcon(section.status)" />
                 </span>
                 <span class="flex-1 font-medium text-slate-900 dark:text-slate-100">
                   {{ section.stepIndex + 1 }}. {{ section.label }}
