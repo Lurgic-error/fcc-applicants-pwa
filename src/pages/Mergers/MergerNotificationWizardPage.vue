@@ -14,7 +14,7 @@ import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { useDeepForm } from '@/composables/useDeepForm'
 import { useAutoSave } from '@/composables/useAutoSave'
 import { createInitialFormState, STEPS } from '@/constants/mergerFcc8Config'
-import MergerWizardSidebar from '@/components/merger/MergerWizardSidebar.vue'
+import WizardSidebar from '@/components/wizards/WizardSidebar.vue'
 import { FccPageHeader } from '@shared/design-system/components'
 import ApplicationCompletenessDrawer from '@/components/ApplicationCompletenessDrawer.vue'
 
@@ -99,6 +99,12 @@ provide('wizardForm', form)
 // ── Visible steps (Local Nexus is conditional) ───────────────────────
 const visibleSteps = computed(() =>
   STEPS.filter(s => !s.conditional || form.localNexus.isApplicable)
+)
+
+const currentStepKey = computed(() => visibleSteps.value[currentStep.value]?.id || '')
+
+const sidebarSteps = computed(() =>
+  visibleSteps.value.map(s => ({ key: s.id, label: s.label }))
 )
 
 const currentStepDef = computed(() => visibleSteps.value[currentStep.value])
@@ -193,10 +199,12 @@ onMounted(() => {
 
     <div class="merger-wizard__body">
       <!-- ── Sidebar ──────────────────────────────────────── -->
-      <MergerWizardSidebar
-        :steps="visibleSteps"
-        :current-step="currentStep"
-        @navigate="goToStep"
+      <WizardSidebar
+        :steps="sidebarSteps"
+        :current-step-key="currentStepKey"
+        title="Merger Notification"
+        subtitle="FCC Form 8"
+        @step-click="(key) => goToStep(sidebarSteps.findIndex(s => s.key === key))"
       />
 
       <!-- ── Content ──────────────────────────────────────── -->

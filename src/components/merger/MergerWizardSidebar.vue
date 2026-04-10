@@ -1,3 +1,4 @@
+// DEPRECATED: Replaced by generic WizardSidebar.vue (2026-04-10)
 <script setup>
 /**
  * Sidebar step navigation for FCC-8 merger wizard.
