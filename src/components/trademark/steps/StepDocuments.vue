@@ -16,8 +16,8 @@ const requiredDocs = computed(() =>
 <template>
   <div class="space-y-5">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Documents & Attachments</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Documents & Attachments</h3>
+      <p class="wizard-step__description">
         Upload all required supporting documents for your request.
       </p>
     </div>
@@ -25,14 +25,13 @@ const requiredDocs = computed(() =>
     <!-- Required documents info box -->
     <div
       v-if="requiredDocs.length"
-      class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3"
+      class="wizard-step__info"
     >
-      <p class="text-sm font-semibold text-sky-800">Required Documents</p>
-      <ul class="mt-2 list-inside list-disc space-y-1">
+      <strong>Required Documents</strong>
+      <ul>
         <li
           v-for="doc in requiredDocs"
           :key="doc.key"
-          class="text-sm text-sky-700"
         >
           {{ doc.label }}
         </li>

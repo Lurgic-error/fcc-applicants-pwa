@@ -10,8 +10,8 @@ const requestType = computed(() => form.requestType)
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Request Details</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Request Details</h3>
+      <p class="wizard-step__description">
         Provide additional information specific to your selected request type.
       </p>
     </div>

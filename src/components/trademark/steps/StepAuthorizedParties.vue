@@ -25,8 +25,8 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Authorized Parties</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Authorized Parties</h3>
+      <p class="wizard-step__description">
         List parties authorized to use or deal in goods bearing this trademark (distributors,
         importers, licensees, etc.). This section is optional.
       </p>

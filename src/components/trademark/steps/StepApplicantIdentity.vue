@@ -8,8 +8,8 @@ const form = inject('wizardForm')
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Applicant Identity</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Applicant Identity</h3>
+      <p class="wizard-step__description">
         Provide details about the party submitting this request.
       </p>
     </div>
@@ -91,11 +91,10 @@ const form = inject('wizardForm')
 
       <!-- Agent section (only when applicantRole === 'agent') -->
       <template v-if="form.applicantRole === 'agent'">
-        <div class="rounded-xl border border-sky-200 bg-sky-50 p-4">
-          <p class="text-sm font-semibold text-sky-800">Agent / Representative Details</p>
-          <p class="mt-1 text-xs text-sky-700">
-            You are submitting on behalf of a brand owner. The brand owner's details will be captured in the next step.
-          </p>
+        <div class="wizard-step__info">
+          <strong>Agent / Representative Details</strong>
+          <br>
+          You are submitting on behalf of a brand owner. The brand owner's details will be captured in the next step.
         </div>
 
         <SmartFormGrid :max-cols="3">

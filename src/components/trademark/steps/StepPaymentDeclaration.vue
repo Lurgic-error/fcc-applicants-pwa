@@ -18,15 +18,15 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
 <template>
   <div class="space-y-6">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Payment & Declaration</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Payment & Declaration</h3>
+      <p class="wizard-step__description">
         Complete payment details and sign the declaration to submit your request.
       </p>
     </div>
 
     <!-- Payment section -->
     <section class="space-y-3">
-      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Payment</h3>
+      <h3 class="wizard-step__section-title">Payment</h3>
 
       <template v-if="paymentRequired">
         <TrademarkPaymentPanel
@@ -37,7 +37,7 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
       </template>
 
       <template v-else>
-        <div class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        <div class="wizard-step__info wizard-step__success">
           No payment required for <strong>{{ requestTypeLabel }}</strong> requests.
         </div>
       </template>
@@ -45,9 +45,9 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
 
     <!-- Declaration section -->
     <section class="space-y-4">
-      <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Declaration</h3>
+      <h3 class="wizard-step__section-title">Declaration</h3>
 
-      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <div class="wizard-step__declaration-box">
         <el-checkbox v-model="form.declarationAccepted" size="large">
           I declare that the information provided in this application is true, complete, and accurate
           to the best of my knowledge. I understand that any false declaration may result in
@@ -95,3 +95,12 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
     </section>
   </div>
 </template>
+
+<style scoped>
+.wizard-step__declaration-box {
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--el-border-color-lighter, #ebeef5);
+  background: var(--el-fill-color-lighter, #fafafa);
+}
+</style>

@@ -27,13 +27,13 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Trademark Visuals</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Trademark Visuals</h3>
+      <p class="wizard-step__description">
         Describe the visual representations of the trademark (word marks, device marks, combined marks).
       </p>
     </div>
 
-    <div class="rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
+    <div class="wizard-step__info">
       Upload visual image files in the Documents step.
     </div>
 

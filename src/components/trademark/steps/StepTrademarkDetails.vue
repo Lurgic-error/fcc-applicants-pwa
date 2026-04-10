@@ -8,8 +8,8 @@ const form = inject('wizardForm')
 <template>
   <div class="space-y-4">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Trademark Details</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Trademark Details</h3>
+      <p class="wizard-step__description">
         Provide registration and classification information for the trademark.
       </p>
     </div>

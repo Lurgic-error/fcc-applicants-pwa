@@ -21,8 +21,8 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Affiliated Companies</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Affiliated Companies</h3>
+      <p class="wizard-step__description">
         List any companies affiliated with the trademark owner (subsidiaries, licensees, etc.).
         This section is optional.
       </p>

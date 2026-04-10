@@ -23,8 +23,8 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h2 class="text-lg font-semibold text-slate-800">Manufacturers</h2>
-      <p class="mt-1 text-sm text-slate-500">
+      <h3 class="wizard-step__title">Manufacturers</h3>
+      <p class="wizard-step__description">
         List the manufacturers or production facilities associated with goods bearing this trademark.
         This section is optional.
       </p>
