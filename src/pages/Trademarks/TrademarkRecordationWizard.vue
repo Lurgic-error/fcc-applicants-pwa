@@ -419,8 +419,6 @@ onMounted(async () => {
 }
 
 .trademark-wizard__content-inner {
-  max-width: 56rem;
-  margin: 0 auto;
 }
 
 .trademark-wizard__footer {

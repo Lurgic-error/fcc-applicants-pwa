@@ -118,7 +118,8 @@ function isFullWidth(field) {
   <div class="tfm">
     <!-- ── Form card ─────────────────────────────────────────────────────── -->
     <div class="tfm__form-card">
-      <SmartFormGrid :max-cols="maxCols">
+      <el-form label-position="top">
+        <SmartFormGrid :max-cols="maxCols">
         <template v-for="field in fields" :key="field.key">
           <el-form-item
             :label="field.label"
@@ -189,13 +190,14 @@ function isFullWidth(field) {
             />
           </el-form-item>
         </template>
-      </SmartFormGrid>
+        </SmartFormGrid>
 
-      <!-- Form actions -->
-      <div class="tfm__form-actions">
-        <el-button type="primary" @click="handleSubmit">{{ submitLabel }}</el-button>
-        <a v-if="isEditing" class="tfm__cancel-link" @click.prevent="cancelEdit">Cancel</a>
-      </div>
+        <!-- Form actions -->
+        <div class="tfm__form-actions">
+          <el-button type="primary" @click="handleSubmit">{{ submitLabel }}</el-button>
+          <a v-if="isEditing" class="tfm__cancel-link" @click.prevent="cancelEdit">Cancel</a>
+        </div>
+      </el-form>
     </div>
 
     <!-- ── Table ──────────────────────────────────────────────────────────── -->

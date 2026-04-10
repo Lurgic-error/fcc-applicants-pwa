@@ -55,41 +55,43 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
         </el-checkbox>
       </div>
 
-      <SmartFormGrid :max-cols="3">
-        <el-form-item label="Full Name (Declarant)" required>
-          <el-input
-            v-model="form.declarationName"
-            placeholder="Name of signatory"
-            clearable
-          />
-        </el-form-item>
+      <el-form label-position="top">
+        <SmartFormGrid :max-cols="3">
+          <el-form-item label="Full Name (Declarant)" required>
+            <el-input
+              v-model="form.declarationName"
+              placeholder="Name of signatory"
+              clearable
+            />
+          </el-form-item>
 
-        <el-form-item label="Title / Position">
-          <el-input
-            v-model="form.declarationTitle"
-            placeholder="e.g. Director, Legal Counsel"
-            clearable
-          />
-        </el-form-item>
+          <el-form-item label="Title / Position">
+            <el-input
+              v-model="form.declarationTitle"
+              placeholder="e.g. Director, Legal Counsel"
+              clearable
+            />
+          </el-form-item>
 
-        <el-form-item label="Declaration Date">
-          <el-date-picker
-            v-model="form.declarationDate"
-            type="date"
-            value-format="YYYY-MM-DD"
-            style="width: 100%"
-          />
-        </el-form-item>
+          <el-form-item label="Declaration Date">
+            <el-date-picker
+              v-model="form.declarationDate"
+              type="date"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
 
-        <el-form-item label="Additional Notes" class="col-span-full" full-width>
-          <el-input
-            v-model="form.notes"
-            type="textarea"
-            :rows="3"
-            placeholder="Any additional information or remarks"
-          />
-        </el-form-item>
-      </SmartFormGrid>
+          <el-form-item label="Additional Notes" class="col-span-full" full-width>
+            <el-input
+              v-model="form.notes"
+              type="textarea"
+              :rows="3"
+              placeholder="Any additional information or remarks"
+            />
+          </el-form-item>
+        </SmartFormGrid>
+      </el-form>
     </section>
   </div>
 </template>
