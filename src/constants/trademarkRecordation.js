@@ -139,3 +139,57 @@ export function getTrademarkRequiredDocuments(requestType = 'new_recordation', o
 export function labelTrademarkRequestType(requestType = 'new_recordation') {
   return getTrademarkRequestTypeConfig(requestType).shortLabel
 }
+
+export const TRADEMARK_WIZARD_STEPS = Object.freeze([
+  { key: 'request-type', label: 'Request Type' },
+  { key: 'applicant-identity', label: 'Applicant Identity' },
+  {
+    key: 'trademark-registration',
+    label: 'Trademark Registration',
+    children: [
+      { key: 'brand-owner', label: 'Brand Owner' },
+      { key: 'trademark-details', label: 'Trademark Details' },
+      { key: 'affiliated-companies', label: 'Affiliated Companies' },
+      { key: 'manufacturers', label: 'Manufacturers' },
+      { key: 'authorized-parties', label: 'Authorized Parties' },
+      { key: 'trademark-visuals', label: 'Trademark Visuals' },
+    ]
+  },
+  { key: 'request-details', label: 'Request Details' },
+  { key: 'documents', label: 'Documents & Attachments' },
+  { key: 'payment-declaration', label: 'Payment & Declaration' },
+])
+
+export const TRADEMARK_FLAT_STEP_KEYS = Object.freeze(
+  TRADEMARK_WIZARD_STEPS.flatMap(step =>
+    step.children?.length ? step.children.map(c => c.key) : [step.key]
+  )
+)
+
+export function createTrademarkFormState() {
+  return {
+    requestType: 'new_recordation',
+    applicantRole: 'brand_owner',
+    applicantType: 'firm',
+    companyName: '', registrationNumber: '', countryOfIncorporation: 'Tanzania',
+    firstName: '', surname: '', nationalId: '', countryOfResidence: 'Tanzania',
+    contactEmail: '', phoneNumber: '', postalAddress: '', physicalAddress: '',
+    businessDescription: '',
+    contactPersonName: '', contactPersonEmail: '', contactPersonPhone: '',
+    requiresAgent: false,
+    agentName: '', agentFirm: '', agentEmail: '', agentPhone: '', powerOfAttorneyNumber: '',
+    owner: { ownerCategory: 'Corporate Owner', fullName: '', businessAddress: '', nationalityOrJurisdiction: '' },
+    trademark: { trademarkName: '', classOfGoods: '', representationType: 'Combined Mark', countryOfOrigin: 'Tanzania', registrationReference: '', registrationCertificateNumber: '', notes: '' },
+    affiliatedCompanies: [], manufacturers: [], authorizedParties: [], visuals: [],
+    goodsManufacturePlaces: '', licensedUsers: '',
+    currentRecordationNumber: '', alterationDetails: '',
+    previousOwnerName: '', newOwnerName: '', transferReason: '', transferRightsSummary: '',
+    previousLegalName: '', newLegalName: '', nameChangeReason: '',
+    renewalTermYears: 1,
+    attachments: [],
+    notes: '',
+    declarationAccepted: false, declarationName: '', declarationTitle: '',
+    declarationDate: new Date().toISOString().slice(0, 10),
+    payment: { status: 'pending_control_number', controlNumber: '', referenceNumber: '', amountPaid: 0, paidAt: '', receiptNumber: '' },
+  }
+}
