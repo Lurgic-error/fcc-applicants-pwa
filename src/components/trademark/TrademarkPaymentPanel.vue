@@ -76,7 +76,7 @@ function patch(field, nextValue) {
     <el-form label-position="top">
       <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
         <el-form-item class="mb-0" label="Payment Status">
-          <el-select :model-value="value.status" :disabled="readOnly" @update:model-value="patch('status', $event)">
+          <el-select :model-value="value.status" :disabled="readOnly" class="w-full" @update:model-value="patch('status', $event)">
             <el-option label="Pending Control Number" value="pending_control_number" />
             <el-option label="Control Number Issued" value="control_number_issued" />
             <el-option label="Paid" value="paid" />
@@ -108,6 +108,7 @@ function patch(field, nextValue) {
             :min="0"
             controls-position="right"
             :disabled="readOnly"
+            class="!w-full"
             @update:model-value="patch('amountPaid', $event)"
           />
         </el-form-item>
@@ -118,6 +119,7 @@ function patch(field, nextValue) {
             type="date"
             value-format="YYYY-MM-DD"
             :disabled="readOnly"
+            class="!w-full"
             @update:model-value="patch('paidAt', $event)"
           />
         </el-form-item>
