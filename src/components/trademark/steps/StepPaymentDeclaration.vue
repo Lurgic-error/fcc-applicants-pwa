@@ -1,5 +1,6 @@
 <script setup>
 import { inject, computed } from 'vue'
+import { ElMessage } from 'element-plus'
 import TrademarkPaymentPanel from '@/components/trademark/TrademarkPaymentPanel.vue'
 import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import {
@@ -7,12 +8,63 @@ import {
   isTrademarkPaymentRequired,
   labelTrademarkRequestType
 } from '@/constants/trademarkRecordation'
+import {
+  generateTrademarkControlNumber,
+  verifyTrademarkPaymentByControlNumber
+} from '@/services/applicantApi'
 
 const form = inject('wizardForm')
 
 const paymentRequired = computed(() => isTrademarkPaymentRequired(form.requestType))
 const feeAmount = computed(() => getTrademarkFeeByRequestType(form.requestType))
 const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestType))
+
+// Pre-fill payer details from applicant identity
+const payerName = computed(() => {
+  if (form.applicantType === 'individual') return `${form.firstName} ${form.surname}`.trim()
+  return form.companyName || ''
+})
+const payerEmail = computed(() => form.contactEmail || '')
+const payerPhone = computed(() => form.phoneNumber || '')
+
+async function handleGenerateControlNumber() {
+  try {
+    const result = await generateTrademarkControlNumber(form.applicationId || '')
+    const payment = result?.trademarkRecordation?.payment || result?.payment || {}
+    form.payment = {
+      ...form.payment,
+      status: 'control_number_issued',
+      controlNumber: payment.controlNumber || form.payment.controlNumber,
+    }
+    ElMessage.success('Control number generated successfully')
+  } catch (err) {
+    ElMessage.error(err?.message || 'Failed to generate control number')
+  }
+}
+
+async function handleVerifyPayment(controlNumber) {
+  try {
+    const result = await verifyTrademarkPaymentByControlNumber(controlNumber, {
+      applicationId: form.applicationId || ''
+    })
+    const bill = result || {}
+    form.payment = {
+      ...form.payment,
+      status: bill.status === 'PAID' || bill.paid ? 'paid' : form.payment.status,
+      amountPaid: Number(bill.amountPaid || bill.paidAmount || form.payment.amountPaid || 0),
+      paidAt: bill.paidAt || bill.paymentDate || form.payment.paidAt || '',
+      receiptNumber: bill.receiptNumber || bill.payReceipt || form.payment.receiptNumber || '',
+      referenceNumber: bill.referenceNumber || bill.paymentRef || form.payment.referenceNumber || '',
+    }
+    if (form.payment.status === 'paid') {
+      ElMessage.success('Payment verified successfully')
+    } else {
+      ElMessage.info('Payment not yet received. Please try again after paying.')
+    }
+  } catch (err) {
+    ElMessage.error(err?.message || 'Failed to verify payment')
+  }
+}
 </script>
 
 <template>
@@ -35,6 +87,11 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
           v-model="form.payment"
           :expected-amount="feeAmount"
           :payment-required="true"
+          :payer-name="payerName"
+          :payer-email="payerEmail"
+          :payer-phone="payerPhone"
+          @generate-control-number="handleGenerateControlNumber"
+          @verify-payment="handleVerifyPayment"
         />
       </template>
 
