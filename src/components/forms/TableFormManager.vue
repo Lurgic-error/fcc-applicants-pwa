@@ -194,8 +194,8 @@ function isFullWidth(field) {
 
         <!-- Form actions -->
         <div class="tfm__form-actions">
-          <el-button type="primary" @click="handleSubmit">{{ submitLabel }}</el-button>
-          <a v-if="isEditing" class="tfm__cancel-link" @click.prevent="cancelEdit">Cancel</a>
+          <el-button type="primary" size="default" @click="handleSubmit">{{ submitLabel }}</el-button>
+          <el-button v-if="isEditing" @click="cancelEdit">Cancel</el-button>
         </div>
       </el-form>
     </div>
@@ -225,7 +225,7 @@ function isFullWidth(field) {
         <template #default="{ $index }">
           <el-button
             type="danger"
-            link
+            text
             size="small"
             @click.stop="handleDelete($index)"
           >
@@ -240,31 +240,20 @@ function isFullWidth(field) {
 <style scoped>
 /* ── Form card ───────────────────────────────────────────────────────────── */
 .tfm__form-card {
-  background: var(--fcc-bg-surface-muted, #f8fafc);
-  border: 1px solid var(--fcc-border-light, #e5eaf3);
-  border-radius: var(--fcc-radius-lg, 8px);
-  padding: 1rem 1rem 0.75rem;
+  padding: 1.25rem;
+  background: var(--el-bg-color, #fff);
+  border: 1px solid var(--el-border-color-lighter, #ebeef5);
+  border-radius: 8px;
   margin-bottom: 1rem;
 }
 
 /* ── Form actions row ────────────────────────────────────────────────────── */
 .tfm__form-actions {
   display: flex;
-  align-items: center;
   gap: 0.75rem;
-  padding-top: 0.5rem;
-}
-
-.tfm__cancel-link {
-  font-size: 0.8125rem;
-  color: var(--fcc-text-muted, #64748b);
-  cursor: pointer;
-  text-decoration: underline;
-  user-select: none;
-}
-
-.tfm__cancel-link:hover {
-  color: var(--fcc-text-secondary, #475569);
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--el-border-color-extra-light, #f2f6fc);
 }
 
 /* ── Field error ─────────────────────────────────────────────────────────── */
@@ -275,9 +264,9 @@ function isFullWidth(field) {
 
 /* ── Table ───────────────────────────────────────────────────────────────── */
 .tfm__table {
-  border-radius: var(--fcc-radius-md, 6px);
+  border-radius: 6px;
   overflow: hidden;
-  border: 1px solid var(--fcc-border-light, #e5eaf3);
+  border: 1px solid var(--el-border-color-lighter, #ebeef5);
 }
 
 :deep(.tfm__row) {

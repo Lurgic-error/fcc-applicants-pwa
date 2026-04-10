@@ -142,60 +142,55 @@ function childNum(parentIndex, childIndex) {
 <style scoped>
 /* ── Layout ─────────────────────────────────────────────────────────────── */
 .wizard-sidebar {
-  width: 15rem;
-  min-width: 15rem;
-  background: var(--fcc-bg-surface, #fff);
-  border-right: 1px solid var(--fcc-border, #dbe3ef);
+  width: 16rem;
+  min-width: 16rem;
+  background: var(--el-bg-color, #fff);
+  border-right: 1px solid var(--el-border-color-lighter, #ebeef5);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* sidebar itself doesn't scroll; only nav list inside does */
-  /* position/height managed by flex parent — no sticky or 100vh needed */
+  overflow: hidden;
+  /* NO position: sticky, NO height: 100vh — flex parent controls this */
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .wizard-sidebar__header {
-  padding: 0.875rem 0.875rem 0.5rem;
-  border-bottom: 1px solid var(--fcc-border-light, #e5eaf3);
-  flex-shrink: 0; /* stays at top, never collapses */
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
+  flex-shrink: 0;
 }
 
 .wizard-sidebar__title {
-  margin: 0;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 700;
-  color: var(--fcc-text-primary, #0f172a);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: var(--el-text-color-primary);
+  margin: 0;
 }
 
 .wizard-sidebar__subtitle {
-  margin: 0.25rem 0 0;
-  font-size: 0.6875rem;
-  color: var(--fcc-text-muted, #64748b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--el-text-color-secondary);
+  margin: 0.125rem 0 0;
 }
 
 /* ── Progress ────────────────────────────────────────────────────────────── */
 .wizard-sidebar__progress {
-  padding: 0.875rem;
-  border-bottom: 1px solid var(--fcc-border-light, #e5eaf3);
-  flex-shrink: 0; /* stays at top, never collapses */
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
+  flex-shrink: 0;
 }
 
 .wizard-sidebar__progress-bar {
   height: 4px;
   border-radius: 999px;
-  background: var(--fcc-bg-surface-muted, #f8fafc);
+  background: var(--el-fill-color-light, #ebeef5);
   overflow: hidden;
 }
 
 .wizard-sidebar__progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--fcc-primary-700, #1b4683), var(--fcc-secondary-500, #0ea5e9));
+  background: var(--el-color-primary);
   transition: width 0.3s ease;
 }
 
@@ -203,45 +198,49 @@ function childNum(parentIndex, childIndex) {
   margin: 0.375rem 0 0;
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--fcc-text-muted, #64748b);
+  color: var(--el-text-color-secondary);
 }
 
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
 .wizard-sidebar__nav {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 0.375rem;
+  padding: 0.5rem;
 }
 
 /* ── Step base ───────────────────────────────────────────────────────────── */
 .wizard-sidebar__step {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.625rem;
   width: 100%;
-  padding: 0.4375rem 0.5rem;
+  padding: 0.5rem 0.625rem;
   border: none;
-  border-radius: var(--fcc-radius-md, 6px);
+  border-radius: 6px;
   background: transparent;
   cursor: pointer;
   text-align: left;
-  font-family: var(--fcc-font-body, inherit);
-  margin-bottom: 1px;
-  transition: background 0.12s;
+  font-family: inherit;
+  margin-bottom: 2px;
+  transition: background 0.15s, color 0.15s;
+  color: var(--el-text-color-regular);
 }
 
 .wizard-sidebar__step:hover {
-  background: var(--fcc-bg-surface-muted, #f8fafc);
+  background: var(--el-fill-color-light, #f5f7fa);
 }
 
 .wizard-sidebar__step--active {
-  background: color-mix(in srgb, var(--fcc-primary-900, #0f4c81) 6%, var(--fcc-bg-surface, #fff));
+  background: var(--el-color-primary-light-9, #ecf5ff);
+  color: var(--el-color-primary);
 }
 
 /* ── Parent step header (non-clickable) ──────────────────────────────────── */
 .wizard-sidebar__step--parent {
   cursor: default;
   margin-top: 0.375rem;
+  padding-top: 0.625rem;
 }
 
 .wizard-sidebar__step--parent:hover {
@@ -253,43 +252,45 @@ function childNum(parentIndex, childIndex) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--fcc-text-secondary, #475569);
+  color: var(--el-text-color-secondary);
 }
 
 /* ── Child step ──────────────────────────────────────────────────────────── */
 .wizard-sidebar__step--child {
-  padding-left: 2rem;
+  padding-left: 2.25rem;
 }
 
 /* ── Step number badge ───────────────────────────────────────────────────── */
 .wizard-sidebar__step-num {
-  width: 1.375rem;
-  height: 1.375rem;
-  border-radius: var(--fcc-radius-sm, 4px);
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 0.625rem;
+  font-size: 0.6875rem;
   font-weight: 700;
-  background: var(--fcc-bg-surface-muted, #f8fafc);
-  color: var(--fcc-text-muted, #64748b);
+  background: var(--el-fill-color, #f0f2f5);
+  color: var(--el-text-color-secondary);
+  transition: background 0.15s, color 0.15s;
 }
 
 .wizard-sidebar__step-num--child {
   width: 1.25rem;
   height: 1.25rem;
-  font-size: 0.5625rem;
+  font-size: 0.625rem;
+  border-radius: 4px;
 }
 
 .wizard-sidebar__step--active .wizard-sidebar__step-num {
-  background: var(--fcc-primary-900, #0f4c81);
+  background: var(--el-color-primary);
   color: #fff;
 }
 
 .wizard-sidebar__step--done .wizard-sidebar__step-num {
-  background: color-mix(in srgb, var(--fcc-primary-900, #0f4c81) 10%, var(--fcc-bg-surface, #fff));
-  color: var(--fcc-primary-900, #0f4c81);
+  background: var(--el-color-success-light-9, #f0f9eb);
+  color: var(--el-color-success, #67c23a);
 }
 
 /* ── Step text ───────────────────────────────────────────────────────────── */
@@ -300,9 +301,8 @@ function childNum(parentIndex, childIndex) {
 }
 
 .wizard-sidebar__step-label {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--fcc-text-muted, #64748b);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -310,11 +310,11 @@ function childNum(parentIndex, childIndex) {
 
 .wizard-sidebar__step--active .wizard-sidebar__step-label {
   font-weight: 700;
-  color: var(--fcc-text-primary, #0f172a);
+  color: var(--el-color-primary);
 }
 
 .wizard-sidebar__step--done .wizard-sidebar__step-label {
-  color: var(--fcc-text-secondary, #475569);
+  color: var(--el-text-color-regular);
 }
 
 /* ── Mobile: hide sidebar ────────────────────────────────────────────────── */

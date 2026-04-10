@@ -285,7 +285,7 @@ onMounted(async () => {
       :close-on-click-modal="false"
       :show-close="false"
     >
-      <p class="text-sm text-slate-600">
+      <p style="font-size: 0.875rem; color: var(--el-text-color-regular);">
         You have an unsaved draft from a previous session. Would you like to resume where you left off?
       </p>
       <template #footer>
@@ -296,15 +296,18 @@ onMounted(async () => {
 
     <!-- ── Header ──────────────────────────────────────────────────── -->
     <div class="trademark-wizard__header">
-      <div>
+      <div class="trademark-wizard__header-text">
         <h1 class="trademark-wizard__title">Trademark Recordation</h1>
-        <p class="trademark-wizard__subtitle">{{ labelTrademarkRequestType(form.requestType) }}</p>
+        <p class="trademark-wizard__subtitle">
+          <span class="trademark-wizard__subtitle-separator">&#8250;</span>
+          {{ labelTrademarkRequestType(form.requestType) || 'New Application' }}
+        </p>
       </div>
       <div class="trademark-wizard__header-actions">
         <span v-if="lastSavedAt" class="trademark-wizard__last-saved">
-          Saved {{ lastSavedAt.toLocaleTimeString() }}
+          Last saved at {{ lastSavedAt.toLocaleTimeString() }}
         </span>
-        <el-button plain size="small" @click="saveManualDraft">Save Draft</el-button>
+        <el-button type="info" plain size="default" @click="saveManualDraft">Save Draft</el-button>
       </div>
     </div>
 
@@ -332,7 +335,7 @@ onMounted(async () => {
           <h2
             ref="stepHeadingRef"
             tabindex="-1"
-            class="text-base font-bold text-slate-800 mb-1 outline-none"
+            class="trademark-wizard__step-heading"
           >
             {{ currentStepLabel }}
           </h2>
@@ -346,7 +349,7 @@ onMounted(async () => {
       <el-button :disabled="isFirstStep" @click="previousStep">Previous</el-button>
 
       <div class="trademark-wizard__footer-right">
-        <el-button plain size="small" @click="saveManualDraft">Save Draft</el-button>
+        <el-button type="info" plain @click="saveManualDraft">Save Draft</el-button>
         <el-button
           v-if="isLastStep"
           type="primary"
@@ -367,75 +370,160 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden; /* outer shell never scrolls */
-  background: var(--fcc-bg-canvas, #f1f5f9);
+  height: 100dvh; /* dynamic viewport height for mobile browsers */
+  overflow: hidden; /* NEVER scrolls */
+  background: var(--el-bg-color-page, #f5f7fa);
 }
 
 .trademark-wizard__header {
-  padding: 0.75rem 1rem;
-  background: var(--fcc-bg-surface, #fff);
-  border-bottom: 1px solid var(--fcc-border, #dbe3ef);
   flex-shrink: 0;
+  padding: 0.875rem 1.25rem;
+  background: var(--el-bg-color, #fff);
+  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+}
+
+.trademark-wizard__header-text {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
 }
 
 .trademark-wizard__title {
   margin: 0;
-  font-size: var(--fcc-text-lg, 1rem);
+  font-size: 1rem;
   font-weight: 800;
-  color: var(--fcc-text-primary, #0f172a);
-  font-family: var(--fcc-font-heading, 'Outfit', sans-serif);
+  color: var(--el-text-color-primary);
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .trademark-wizard__subtitle {
   margin: 0;
-  font-size: var(--fcc-text-xs, 0.75rem);
-  color: var(--fcc-text-muted, #64748b);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--el-text-color-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.trademark-wizard__subtitle-separator {
+  color: var(--el-text-color-placeholder);
+  margin-right: 0.125rem;
 }
 
 .trademark-wizard__header-actions {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .trademark-wizard__last-saved {
   font-size: 0.75rem;
-  color: var(--fcc-text-muted, #64748b);
+  font-weight: 500;
+  color: var(--el-text-color-placeholder);
+  white-space: nowrap;
 }
 
 .trademark-wizard__body {
   display: flex;
   flex: 1;
-  min-height: 0; /* allows flex children to shrink below content size */
-  overflow: hidden; /* prevents body-level scroll */
+  min-height: 0; /* allows flex children to shrink */
+  overflow: hidden;
 }
 
 .trademark-wizard__content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: var(--el-bg-color-page, #f5f7fa);
 }
 
 .trademark-wizard__content-inner {
 }
 
+.trademark-wizard__step-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+  margin: 0 0 0.25rem;
+  line-height: 1.4;
+  outline: none;
+}
+
 .trademark-wizard__footer {
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: var(--fcc-bg-surface, #fff);
-  border-top: 1px solid var(--fcc-border, #dbe3ef);
-  flex-shrink: 0;
+  padding: 0.75rem 1.25rem;
+  background: var(--el-bg-color, #fff);
+  border-top: 1px solid var(--el-border-color-lighter, #ebeef5);
+  gap: 0.75rem;
 }
 
 .trademark-wizard__footer-right {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+}
+
+/* ── Wizard step shared styles (cascade into step components) ──────────── */
+:deep(.wizard-step__title) {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--el-text-color-primary);
+  margin: 0 0 0.25rem;
+  line-height: 1.4;
+}
+
+:deep(.wizard-step__description) {
+  font-size: 0.8125rem;
+  color: var(--el-text-color-secondary);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+:deep(.wizard-step__section-title) {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+  margin: 0 0 0.75rem;
+}
+
+:deep(.wizard-step__info) {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  background: var(--el-color-primary-light-9, #ecf5ff);
+  color: var(--el-color-primary-dark-2);
+  border: 1px solid var(--el-color-primary-light-7, #c6e2ff);
+  margin-bottom: 1rem;
+}
+
+:deep(.wizard-step__info strong) {
+  font-weight: 600;
+}
+
+:deep(.wizard-step__info ul) {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+:deep(.wizard-step__info li) {
+  margin-bottom: 0.25rem;
+}
+
+:deep(.wizard-step__success) {
+  background: var(--el-color-success-light-9, #f0f9eb);
+  color: var(--el-color-success-dark-2);
+  border-color: var(--el-color-success-light-5, #b3e19d);
 }
 </style>
