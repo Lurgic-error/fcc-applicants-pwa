@@ -17,6 +17,19 @@ function guardApplicationService(to) {
   return { name: 'services' }
 }
 
+/**
+ * Redirect trademark-recordation to the dedicated wizard route.
+ * TrademarkRecordationWizard is a standalone page component that must be
+ * loaded directly — not embedded inside ApplicationWizardPage.
+ */
+function guardApplicationCreateService(to) {
+  const serviceKey = String(to.params.serviceKey || '')
+  if (serviceKey === 'trademark-recordation') {
+    return { name: 'trademark-create', query: to.query }
+  }
+  return guardApplicationService(to)
+}
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -161,7 +174,7 @@ const router = createRouter({
           path: 'applications/:serviceKey/create',
           name: 'application-create',
           component: () => import('@/pages/ApplicationWizardPage.vue'),
-          beforeEnter: guardApplicationService,
+          beforeEnter: guardApplicationCreateService,
           props: (route) => ({
             serviceKey: String(route.params.serviceKey),
             mode: 'create'

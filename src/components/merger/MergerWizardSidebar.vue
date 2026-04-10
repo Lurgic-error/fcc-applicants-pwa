@@ -1,5 +1,5 @@
-// DEPRECATED: Replaced by generic WizardSidebar.vue (2026-04-10)
 <script setup>
+// DEPRECATED: Replaced by generic WizardSidebar.vue (2026-04-10)
 /**
  * Sidebar step navigation for FCC-8 merger wizard.
  * Shows progress bar, step list with active/complete states, click-to-navigate.

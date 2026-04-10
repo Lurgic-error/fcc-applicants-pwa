@@ -1,6 +1,6 @@
+<script setup>
 // DEPRECATED: Replaced by TrademarkRecordationWizard.vue (2026-04-10)
 // This file is kept for reference but is no longer routed to.
-<script setup>
 import { ElMessage } from 'element-plus'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
