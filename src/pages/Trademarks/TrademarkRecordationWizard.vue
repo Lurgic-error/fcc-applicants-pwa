@@ -309,7 +309,7 @@ onMounted(async () => {
     </div>
 
     <!-- ── Mobile navigator (hidden on lg+) ───────────────────────── -->
-    <div class="lg:hidden px-4 py-2">
+    <div class="lg:hidden px-4 py-2" style="flex-shrink: 0">
       <MobileStepNavigator
         :steps="mobileSteps"
         :current-step="currentFlatIndex"
@@ -367,6 +367,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  overflow: hidden; /* outer shell never scrolls */
   background: var(--fcc-bg-canvas, #f1f5f9);
 }
 
@@ -409,7 +410,8 @@ onMounted(async () => {
 .trademark-wizard__body {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  min-height: 0; /* allows flex children to shrink below content size */
+  overflow: hidden; /* prevents body-level scroll */
 }
 
 .trademark-wizard__content {

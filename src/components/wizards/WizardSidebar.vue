@@ -148,16 +148,15 @@ function childNum(parentIndex, childIndex) {
   border-right: 1px solid var(--fcc-border, #dbe3ef);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  position: sticky;
-  top: 0;
-  height: 100vh;
+  overflow: hidden; /* sidebar itself doesn't scroll; only nav list inside does */
+  /* position/height managed by flex parent — no sticky or 100vh needed */
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */
 .wizard-sidebar__header {
   padding: 0.875rem 0.875rem 0.5rem;
   border-bottom: 1px solid var(--fcc-border-light, #e5eaf3);
+  flex-shrink: 0; /* stays at top, never collapses */
 }
 
 .wizard-sidebar__title {
@@ -183,6 +182,7 @@ function childNum(parentIndex, childIndex) {
 .wizard-sidebar__progress {
   padding: 0.875rem;
   border-bottom: 1px solid var(--fcc-border-light, #e5eaf3);
+  flex-shrink: 0; /* stays at top, never collapses */
 }
 
 .wizard-sidebar__progress-bar {
