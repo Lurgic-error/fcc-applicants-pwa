@@ -17,6 +17,11 @@ import { useAuthStore } from '@/stores/auth'
 import { useAutoSave } from '@/composables/useAutoSave'
 import ApplicantInfoStep from '@/components/wizards/ApplicantInfoStep.vue'
 import ApplicationFeeSummary from '@/components/wizards/ApplicationFeeSummary.vue'
+import GePGPaymentPanel from '@/components/forms/GePGPaymentPanel.vue'
+import {
+  generateTrademarkControlNumber,
+  verifyTrademarkPaymentByControlNumber
+} from '@/services/applicantApi'
 
 const EXEMPTION_FEE = 180000
 
@@ -57,6 +62,7 @@ const pageTitle = computed(() => `${isEditMode.value ? 'Update' : 'New'} ${servi
 const wizardSteps = [
   { title: 'Applicant' },
   { title: 'Exemption Details' },
+  { title: 'Payment' },
   { title: 'Review & Submit' }
 ]
 
@@ -87,12 +93,25 @@ const form = reactive({
     durationYears: 1,
     attachments: []
   },
+  payment: {
+    status: 'pending_control_number',
+    controlNumber: '',
+    referenceNumber: '',
+    amountPaid: 0,
+    paidAt: '',
+    receiptNumber: ''
+  },
   declaration: {
     accepted: false,
     name: '',
     title: '',
     date: new Date().toISOString().slice(0, 10)
   }
+})
+
+const payerName = computed(() => {
+  if (form.applicant.type === 'company') return form.applicant.companyName || ''
+  return [form.applicant.firstName, form.applicant.surname].filter(Boolean).join(' ')
 })
 
 const { lastSaved, showResumePrompt, saveDraft, resumeDraft, discardDraft, clearDraft, checkForExistingDraft } = useAutoSave(
@@ -144,6 +163,7 @@ const rules = computed(() => ({
 const stepFieldMap = [
   ['applicant.email'],
   ['exemption.exemptionType', 'exemption.agreementDescription', 'exemption.justification'],
+  [],
   []
 ]
 
@@ -153,10 +173,59 @@ async function validateCurrentStep() {
   if (fields.length) {
     await formRef.value.validateField(fields)
   }
-  if (stepIndex.value === 2 && !form.declaration.accepted) {
+  if (stepIndex.value === 3 && !form.declaration.accepted) {
     throw new Error('Accept the declaration before submitting.')
   }
   return true
+}
+
+async function handleGenerateControlNumber() {
+  if (!existingApplication.value?.applicationId) {
+    ElMessage.warning('Please save a draft first before generating a control number.')
+    return
+  }
+  try {
+    const result = await generateTrademarkControlNumber(existingApplication.value.applicationId)
+    const payment = result?.payment || {}
+    form.payment = {
+      ...form.payment,
+      controlNumber: payment.controlNumber || result?.controlNumber || '',
+      amountDue: payment.amountDue || EXEMPTION_FEE,
+      amountPaid: payment.amountPaid || 0,
+      status: 'control_number_issued'
+    }
+    ElMessage.success('Control number generated successfully.')
+  } catch (err) {
+    ElMessage.error(err?.message || 'Failed to generate control number. Please try again.')
+  }
+}
+
+async function handleVerifyPayment(controlNumber) {
+  if (!controlNumber) return
+  try {
+    const result = await verifyTrademarkPaymentByControlNumber(controlNumber, {
+      applicationId: existingApplication.value?.applicationId || ''
+    })
+    const bill = result?.bill || result || {}
+    const paid = Number(bill.amountPaid || bill.paidAmount || 0)
+    form.payment = {
+      ...form.payment,
+      amountPaid: paid,
+      paidAt: bill.paidAt || '',
+      referenceNumber: bill.referenceNumber || '',
+      receiptNumber: bill.receiptNumber || '',
+      status: paid >= EXEMPTION_FEE ? 'paid' : 'pending_payment'
+    }
+    if (paid >= EXEMPTION_FEE) {
+      ElMessage.success('Payment confirmed!')
+    } else if (paid > 0) {
+      ElMessage.warning(`Partial payment received: TZS ${paid.toLocaleString()}`)
+    } else {
+      ElMessage.info('Payment not yet received. Please check again later.')
+    }
+  } catch (err) {
+    ElMessage.error(err?.message || 'Failed to verify payment.')
+  }
 }
 
 async function nextStep() {
@@ -233,6 +302,16 @@ function mapApplicationToForm(application) {
     justification: serviceDetails.justification || raw.justification || '',
     durationYears: Number(serviceDetails.durationYears || raw.durationYears || 1)
   })
+
+  const rawPayment = raw.payment || {}
+  Object.assign(form.payment, {
+    status: rawPayment.status || 'pending_control_number',
+    controlNumber: rawPayment.controlNumber || '',
+    referenceNumber: rawPayment.referenceNumber || '',
+    amountPaid: Number(rawPayment.amountPaid || 0),
+    paidAt: rawPayment.paidAt || '',
+    receiptNumber: rawPayment.receiptNumber || ''
+  })
 }
 
 async function loadExisting() {
@@ -282,6 +361,7 @@ async function submit() {
       },
       exemption: { ...form.exemption },
       applicationFee: EXEMPTION_FEE,
+      payment: { ...form.payment },
       declaration: { ...form.declaration }
     }
 
@@ -431,8 +511,22 @@ onMounted(async () => {
         </div>
       </template>
 
-      <!-- Step 2: Review & Submit -->
+      <!-- Step 2: Payment -->
       <template v-if="stepIndex === 2">
+        <GePGPaymentPanel
+          v-model="form.payment"
+          :expected-amount="EXEMPTION_FEE"
+          :payment-required="true"
+          :payer-name="payerName"
+          :payer-email="form.applicant.email"
+          :payer-phone="form.applicant.phoneNumber"
+          @generate-control-number="handleGenerateControlNumber"
+          @verify-payment="handleVerifyPayment"
+        />
+      </template>
+
+      <!-- Step 3: Review & Submit -->
+      <template v-if="stepIndex === 3">
         <div class="space-y-6">
           <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Applicant</h3>
