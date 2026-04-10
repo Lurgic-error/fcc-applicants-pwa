@@ -20,7 +20,9 @@ const requestTypeLabel = computed(() => labelTrademarkRequestType(form.requestTy
     <div>
       <h3 class="wizard-step__title">Payment & Declaration</h3>
       <p class="wizard-step__description">
-        Complete payment details and sign the declaration to submit your request.
+        Pay the statutory fee via GePG (Government e-Payment Gateway): generate a control number,
+        pay at any bank or mobile money service, then verify the payment here. Once confirmed,
+        sign the declaration and submit.
       </p>
     </div>
 
