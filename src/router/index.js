@@ -94,7 +94,8 @@ const router = createRouter({
         {
           path: 'trademarks/new',
           name: 'trademark-create',
-          redirect: { name: 'application-create', params: { serviceKey: 'trademark-recordation' } }
+          component: () => import('@/pages/Trademarks/TrademarkRecordationWizard.vue'),
+          meta: { title: 'New Trademark Recordation', requiresAuth: true }
         },
         {
           path: 'trademarks/:id',

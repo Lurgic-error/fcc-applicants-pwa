@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import TrademarkWizardAdapter from '@/components/wizards/TrademarkWizardAdapter.vue'
+import TrademarkRecordationWizard from '@/pages/Trademarks/TrademarkRecordationWizard.vue'
 import GenericServiceWizardAdapter from '@/components/wizards/GenericServiceWizardAdapter.vue'
 import SFCCWizardAdapter from '@/components/wizards/SFCCWizardAdapter.vue'
 import ExemptionWizardAdapter from '@/components/wizards/ExemptionWizardAdapter.vue'
@@ -24,9 +24,8 @@ const isLegalOpinionService = computed(() => props.serviceKey === 'legal-opinion
 </script>
 
 <template>
-  <TrademarkWizardAdapter
+  <TrademarkRecordationWizard
     v-if="isTrademarkService"
-    :service-key="serviceKey"
     :mode="mode"
   />
   <SFCCWizardAdapter
