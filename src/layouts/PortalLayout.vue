@@ -25,7 +25,7 @@ const dataStore = useApplicantDataStore()
 
 const navigationLinks = [
   { label: 'Dashboard', name: 'dashboard', icon: 'fa-solid fa-gauge' },
-  { label: 'Services', name: 'services', icon: 'fa-solid fa-grid-2' },
+  { label: 'Services', name: 'services', icon: 'fa-solid fa-th-large' },
   { label: 'Applications', name: 'applications', icon: 'fa-solid fa-file-lines' },
   { label: 'Certificates', name: 'certificates', icon: 'fa-solid fa-certificate' },
   { label: 'Payments', name: 'payments', icon: 'fa-solid fa-credit-card' },
@@ -94,9 +94,10 @@ watch(() => dataStore.applications, (apps) => {
 }, { once: true })
 
 const firstName = computed(() => {
-  if (!authStore.fullName) {
-    return 'Applicant'
+  if (authStore.isCompanyApplicant) {
+    return authStore.displayName || 'Organization'
   }
+  if (!authStore.fullName) return 'Applicant'
   return authStore.fullName.split(' ')[0]
 })
 
@@ -266,10 +267,11 @@ async function logout() {
     >
       <div class="h-full overflow-y-auto p-3 md:p-4">
         <div class="mb-4 flex items-center gap-2.5 px-2">
-          <img src="@/assets/imgs/logo-2-removebg-preview.png" alt="FCC" class="fcc-seal h-10 w-auto shrink-0" />
+          <div class="sidebar-logo shrink-0">
+            <img src="@/assets/imgs/logo-2-removebg-preview.png" alt="FCC" class="fcc-seal h-10 w-auto" />
+          </div>
           <div class="min-w-0">
-            <p class="text-sm font-bold leading-tight text-fcc-ink dark:text-slate-100 truncate">Fair Competition</p>
-            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">Commission</p>
+            <p class="text-[13px] font-bold leading-tight text-fcc-ink dark:text-slate-100 whitespace-nowrap">Fair Competition Commission</p>
           </div>
         </div>
         <nav aria-label="Main navigation" class="space-y-2">
@@ -277,15 +279,11 @@ async function logout() {
             v-for="link in navigationLinks"
             :key="link.name"
             :to="{ name: link.name }"
-            class="block rounded-xl px-3 py-2 text-sm font-medium transition"
-            :class="
-              isLinkActive(link)
-                ? 'bg-fcc-brand text-white'
-                : 'text-slate-700 hover:bg-sky-50 hover:text-fcc-brand dark:text-slate-200 dark:hover:bg-slate-800'
-            "
+            class="sidebar-link"
+            :class="{ 'sidebar-link--active': isLinkActive(link) }"
             @click="mobileNavOpen = false"
           >
-              <i :class="link.icon" class="mr-3 w-5 text-center text-sm" aria-hidden="true" />
+              <i :class="link.icon" class="sidebar-link__icon" aria-hidden="true" />
               {{ link.label }}
           </router-link>
         </nav>
@@ -293,7 +291,7 @@ async function logout() {
     </aside>
 
     <main id="main-content" class="fixed bottom-[var(--portal-gap)] left-[var(--portal-gap)] right-[var(--portal-gap)] top-[calc(var(--portal-gap)+var(--portal-header-height)+var(--portal-gap))] z-10 overflow-y-auto lg:left-[calc(var(--portal-sidebar-width)+var(--portal-gap)+var(--portal-gap))] lg:bottom-[calc(var(--portal-gap)+var(--portal-footer-height)+var(--portal-gap))]">
-      <div class="min-h-full min-w-0 overflow-x-hidden rounded-2xl border border-slate-200 bg-white p-4 shadow-panel dark:border-slate-800 dark:bg-slate-900 md:p-6">
+      <div class="portal-content-box min-h-full min-w-0 overflow-x-hidden rounded-2xl border border-slate-200 bg-white p-4 pb-6 shadow-panel dark:border-slate-800 dark:bg-slate-900 md:p-6 md:pb-8">
         <ErrorBoundary>
           <ApplicantBreadcrumbs />
           <router-view />
@@ -335,6 +333,92 @@ async function logout() {
   .portal-shell {
     --portal-header-height: 78px;
   }
+}
+
+/* ── Main content box: full-height for wizard shells ── */
+#main-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.portal-content-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* ── Sidebar logo dark mode ── */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--fcc-radius-lg);
+}
+
+:root[data-theme='dark'] .sidebar-logo {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px;
+  border-radius: var(--fcc-radius-lg);
+}
+
+/* ── Sidebar nav links ── */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  padding: 0.55rem 0.85rem;
+  border-radius: var(--fcc-radius-lg);
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--fcc-text-primary);
+  text-decoration: none;
+  transition: all 150ms ease;
+  margin-bottom: 2px;
+}
+
+.sidebar-link:hover {
+  background: var(--fcc-bg-surface-muted);
+  color: var(--fcc-text-primary);
+}
+
+.sidebar-link--active {
+  background: var(--fcc-primary-900);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(15, 76, 129, 0.25);
+}
+
+.sidebar-link--active:hover {
+  background: var(--fcc-primary-800);
+  color: #ffffff;
+}
+
+:root[data-theme='dark'] .sidebar-link--active {
+  background: var(--fcc-primary-600);
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(14, 165, 233, 0.2);
+}
+
+:root[data-theme='dark'] .sidebar-link--active:hover {
+  background: var(--fcc-primary-500);
+}
+
+.sidebar-link__icon {
+  width: 1.25rem;
+  text-align: center;
+  font-size: 0.85rem;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.sidebar-link:hover .sidebar-link__icon {
+  opacity: 0.85;
+}
+
+.sidebar-link--active .sidebar-link__icon {
+  opacity: 1;
+  color: inherit;
 }
 
 .fade-enter-active,

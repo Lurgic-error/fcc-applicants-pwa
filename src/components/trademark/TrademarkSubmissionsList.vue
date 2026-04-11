@@ -74,8 +74,8 @@ const totalFee = computed(() =>
         <div class="tm-list__card-row tm-list__card-row--title">
           <span class="tm-list__name">{{ trademark.trademarkName || 'Untitled Trademark' }}</span>
           <div class="tm-list__actions">
-            <el-button size="small" type="primary" plain @click="emit('edit', index)">Edit</el-button>
-            <el-button size="small" type="danger" plain @click="emit('remove', index)">Remove</el-button>
+            <el-button type="primary" plain @click="emit('edit', index)">Edit</el-button>
+            <el-button type="danger" plain @click="emit('remove', index)">Remove</el-button>
           </div>
         </div>
 

@@ -32,7 +32,7 @@ function remove(index) {
     <div v-for="(item, index) in items" :key="index" class="merger-array__card">
       <div class="merger-array__card-head">
         <span class="merger-array__card-title">{{ title }} #{{ index + 1 }}</span>
-        <el-button v-if="items.length > minItems" type="danger" text size="small" @click="remove(index)">Remove</el-button>
+        <el-button v-if="items.length > minItems" type="danger" text @click="remove(index)">Remove</el-button>
       </div>
       <div class="merger-array__card-body">
         <slot :item="item" :index="index" :path="`${path}.${index}`" />

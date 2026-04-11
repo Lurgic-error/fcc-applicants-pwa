@@ -8,7 +8,7 @@ const fields = [
   { key: 'fullName', label: 'Full Name', required: true },
   { key: 'role', label: 'Role', required: true, placeholder: 'e.g. Distributor, Importer' },
   { key: 'address', label: 'Address' },
-  { key: 'country', label: 'Country' },
+  { key: 'country', label: 'Country', type: 'country' },
   { key: 'email', label: 'Email' },
   { key: 'phone', label: 'Phone' },
   { key: 'notes', label: 'Notes', type: 'textarea', fullWidth: true }
@@ -25,11 +25,8 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Authorized Parties</h3>
-      <p class="wizard-step__description">
         List parties authorized to use or deal in goods bearing this trademark (distributors,
         importers, licensees, etc.). This section is optional.
-      </p>
     </div>
 
     <TableFormManager

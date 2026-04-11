@@ -69,7 +69,7 @@ onMounted(() => {
       role="dialog"
       aria-modal="false"
       :aria-label="`Tip: ${currentTip.title}`"
-      class="fixed bottom-6 right-6 z-[700] w-72 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
+      class="onboarding-tip fixed right-6 z-[700] w-72 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 dark:bg-slate-900 dark:ring-slate-700"
     >
       <div class="p-4">
         <div class="flex items-start justify-between gap-3">
@@ -123,6 +123,16 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.onboarding-tip {
+  bottom: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .onboarding-tip {
+    bottom: calc(var(--portal-gap, 1rem) + var(--portal-footer-height, 56px) + 1rem);
+  }
+}
+
 .tip-fade-enter-active,
 .tip-fade-leave-active {
   transition: opacity 0.25s ease, transform 0.25s ease;

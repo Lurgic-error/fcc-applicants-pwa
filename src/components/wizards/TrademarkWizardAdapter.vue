@@ -22,6 +22,7 @@ import {
   labelTrademarkRequestType
 } from '@/constants/trademarkRecordation'
 import ApplicantInfoStep from './ApplicantInfoStep.vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 import TrademarkAttachmentManager from '@/components/trademark/TrademarkAttachmentManager.vue'
 import TrademarkPaymentPanel from '@/components/trademark/TrademarkPaymentPanel.vue'
 import TrademarkRequestTypeSelector from '@/components/trademark/TrademarkRequestTypeSelector.vue'
@@ -279,10 +280,10 @@ const form = reactive({
   }
 })
 
-const { lastSaved, showResumePrompt, saveDraft, resumeDraft, discardDraft, clearDraft, checkForExistingDraft } = useAutoSave(
+const { lastSavedAt: lastSaved, hasDraft: showResumePrompt, save: saveDraft, restore: resumeDraft, clearDraft } = useAutoSave(
   `fcc_wizard_draft_${props.serviceKey}`,
-  () => ({ ...form }),
-  (data) => Object.assign(form, data)
+  { value: form },
+  { onRestore: (data) => Object.assign(form, data) }
 )
 
 const formSnapshot = ref('')
@@ -957,7 +958,7 @@ onMounted(async () => {
   captureSnapshot()
 
   if (!isEditMode.value) {
-    checkForExistingDraft()
+    resumeDraft()
   }
 })
 
@@ -1031,8 +1032,8 @@ watch(
         You have an unsaved draft from a previous session. Would you like to resume?
       </p>
       <div class="mt-3 flex gap-2">
-        <el-button type="primary" size="small" @click="resumeDraft">Resume Draft</el-button>
-        <el-button size="small" @click="discardDraft">Start Fresh</el-button>
+        <el-button type="primary" @click="resumeDraft">Resume Draft</el-button>
+        <el-button @click="clearDraft">Start Fresh</el-button>
       </div>
     </div>
 
@@ -1093,7 +1094,7 @@ watch(
           <el-input v-model="form.trademarkRecordation.ownerBusinessAddress" />
         </el-form-item>
         <el-form-item label="Owner Nationality / Jurisdiction" prop="trademarkRecordation.ownerNationalityOrJurisdiction">
-          <el-input v-model="form.trademarkRecordation.ownerNationalityOrJurisdiction" />
+          <CountrySelect v-model="form.trademarkRecordation.ownerNationalityOrJurisdiction" placeholder="Select nationality or jurisdiction" />
         </el-form-item>
         <div class="md:col-span-2">
           <p class="mb-2 text-sm font-semibold text-slate-600">Applicant Information</p>
@@ -1103,7 +1104,7 @@ watch(
         <div class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Submitted Trademarks</h3>
-            <el-button size="small" type="primary" plain @click="addTrademarkRow">Add Trademark</el-button>
+            <el-button type="primary" plain @click="addTrademarkRow">Add Trademark</el-button>
           </div>
 
           <div
@@ -1118,12 +1119,12 @@ watch(
               <el-option label="Device Mark" value="Device Mark" />
               <el-option label="Combined Mark" value="Combined Mark" />
             </el-select>
-            <el-input v-model="trademark.countryOfOrigin" placeholder="Country of origin" />
+            <CountrySelect v-model="trademark.countryOfOrigin" placeholder="Select country of origin" />
             <el-input v-model="trademark.registrationReference" class="md:col-span-2" placeholder="Registration reference" />
             <el-input v-model="trademark.registrationCertificateNumber" class="md:col-span-2" placeholder="Registration certificate number" />
             <el-input v-model="trademark.notes" class="md:col-span-2" type="textarea" :rows="2" placeholder="Trademark notes (optional)" />
             <div class="md:col-span-2">
-              <el-button size="small" type="danger" plain @click="removeTrademarkRow(index)">Remove Trademark</el-button>
+              <el-button type="danger" plain @click="removeTrademarkRow(index)">Remove Trademark</el-button>
             </div>
           </div>
         </div>
@@ -1233,7 +1234,7 @@ watch(
           <el-date-picker v-model="form.trademarkRecordation.declarationDate" type="date" value-format="YYYY-MM-DD" />
         </el-form-item>
         <el-form-item prop="trademarkRecordation.declarationAccepted" class="md:col-span-2">
-          <el-checkbox v-model="form.trademarkRecordation.declarationAccepted">
+          <el-checkbox v-model="form.trademarkRecordation.declarationAccepted" class="wizard-declaration-checkbox">
             I declare that the submitted information and documents are true and complete.
           </el-checkbox>
         </el-form-item>

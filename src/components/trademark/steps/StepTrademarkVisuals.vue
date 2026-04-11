@@ -1,8 +1,13 @@
 <script setup>
 import { inject } from 'vue'
+import { UploadFilled } from '@element-plus/icons-vue'
 import TableFormManager from '@/components/forms/TableFormManager.vue'
 
 const form = inject('wizardForm')
+
+if (!form.visualFiles) {
+  form.visualFiles = []
+}
 
 const fields = [
   {
@@ -27,15 +32,25 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Trademark Visuals</h3>
-      <p class="wizard-step__description">
         Describe the visual representations of the trademark (word marks, device marks, combined marks).
-      </p>
     </div>
 
-    <div class="wizard-step__info">
-      Upload visual image files in the Documents step.
-    </div>
+    <el-form-item label="Upload Trademark Visual Images">
+      <el-upload
+        v-model:file-list="form.visualFiles"
+        class="wizard-upload"
+        accept=".jpg,.jpeg,.png,.svg,.pdf,.tiff,.tif"
+        :auto-upload="false"
+        multiple
+        drag
+      >
+        <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+        <div class="el-upload__text">Drop visual images here or <em>click to upload</em></div>
+        <template #tip>
+          <div class="el-upload__tip">JPG, PNG, SVG, PDF, TIFF files accepted</div>
+        </template>
+      </el-upload>
+    </el-form-item>
 
     <TableFormManager
       v-model="form.visuals"

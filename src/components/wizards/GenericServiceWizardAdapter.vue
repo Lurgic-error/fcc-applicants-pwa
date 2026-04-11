@@ -22,6 +22,8 @@ import {
   updateApplicantProfile
 } from '@/services/applicantApi'
 import SchemaWizardShell from './SchemaWizardShell.vue'
+import WizardShell from './WizardShell.vue'
+import WizardSidebar from './WizardSidebar.vue'
 import { useApplicantDataStore } from '@/stores/applications'
 import { useApplicantServiceCatalogStore } from '@/stores/serviceCatalog'
 import { useAuthStore } from '@/stores/auth'
@@ -109,9 +111,12 @@ const calculatedFees = computed(() =>
 )
 
 const wizardSteps = [
-  { title: 'Application' },
-  { title: 'Applicant' }
+  { key: 'application', title: 'Application' },
+  { key: 'applicant', title: 'Applicant' }
 ]
+
+const sidebarSteps = computed(() => wizardSteps.map(s => ({ key: s.key, label: s.title })))
+const currentStepKey = computed(() => wizardSteps[stepIndex.value]?.key || '')
 
 // Computed adapter: maps between ApplicantInfoStep shape and flat form fields
 const applicantModel = computed({
@@ -289,10 +294,10 @@ const form = reactive({
   }
 })
 
-const { lastSaved, showResumePrompt, saveDraft, resumeDraft, discardDraft, clearDraft, checkForExistingDraft } = useAutoSave(
+const { lastSavedAt: lastSaved, hasDraft: showResumePrompt, save: saveDraft, restore: resumeDraft, clearDraft } = useAutoSave(
   `fcc_wizard_draft_${props.serviceKey}`,
-  () => ({ ...form }),
-  (data) => Object.assign(form, data)
+  { value: form },
+  { onRestore: (data) => Object.assign(form, data) }
 )
 
 const formSnapshot = ref('')
@@ -773,7 +778,7 @@ onMounted(async () => {
   captureSnapshot()
 
   if (!isEditMode.value) {
-    checkForExistingDraft()
+    resumeDraft()
   }
 })
 
@@ -787,60 +792,31 @@ watch(
 </script>
 
 <template>
-  <section>
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 class="text-2xl font-semibold">{{ pageTitle }}</h2>
-        <p class="mt-1 text-sm text-slate-600">
-          Complete the wizard to {{ isEditMode ? 'update' : 'submit' }} your {{ service.label.toLowerCase() }} request.
-        </p>
-      </div>
-      <router-link :to="overviewRoute">
-        <el-button>Back to {{ service.label }}</el-button>
-      </router-link>
-    </div>
-
-    <div class="mt-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-800">
-      <div><span class="font-semibold">Application Type:</span> {{ service.label }}</div>
-      <div class="mt-1"><span class="font-semibold">Process:</span> {{ processName }}</div>
-    </div>
-
-    <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4 text-sm">
-      <p class="font-semibold">Process stages</p>
-      <div class="mt-2 flex flex-wrap gap-2">
-        <el-tag v-for="stage in processStages" :key="stage.key" effect="light">{{ stage.title }}</el-tag>
-      </div>
-    </div>
-
-    <!-- Schema-driven rendering (when catalog has structured fields) -->
-    <template v-if="hasSchemaFields">
-      <SchemaWizardShell
-        :service-key="serviceKey"
-        :catalog-profile="catalogProfile"
-        :form-data="form"
-        :initial-step="stepIndex"
-        @update:form-data="Object.assign(form, $event)"
-        @step-change="stepIndex = $event"
-      >
-        <template #submit-button>
-          <el-button type="primary" :loading="submitting" @click="submit">
-            {{ isEditMode ? 'Save Updates' : 'Submit Application' }}
-          </el-button>
-        </template>
-      </SchemaWizardShell>
+  <WizardShell
+    :title="service.label"
+    :subtitle="isEditMode ? 'Edit Application' : 'New Application'"
+    :step-title="wizardSteps[stepIndex]?.title || ''"
+    :current-step-index="stepIndex"
+    :total-steps="wizardSteps.length"
+    :is-first-step="stepIndex === 0"
+    :is-last-step="stepIndex >= wizardSteps.length - 1"
+    :submitting="submitting"
+    :last-saved="lastSaved"
+    :back-route="overviewRoute"
+    :submit-label="isEditMode ? 'Save Updates' : 'Submit Application'"
+    :loading="loadingExisting"
+    @previous="previousStep"
+    @next="nextStep"
+    @submit="submit"
+    @save-draft="saveDraft"
+  >
+    <template #sidebar>
+      <WizardSidebar
+        :steps="sidebarSteps"
+        :current-step-key="currentStepKey"
+        @step-click="(key) => { stepIndex = wizardSteps.findIndex(s => s.key === key) }"
+      />
     </template>
-
-    <!-- Existing hard-coded rendering (fallback) -->
-    <template v-else>
-    <MobileStepNavigator
-      :steps="wizardSteps"
-      :current-step="stepIndex"
-      @update:current-step="stepIndex = $event"
-    />
-
-    <el-steps :active="stepIndex" class="mt-6 hidden lg:flex">
-      <el-step v-for="step in wizardSteps" :key="step.title" :title="step.title" />
-    </el-steps>
 
     <h2
       ref="stepHeadingRef"
@@ -850,23 +826,22 @@ watch(
       Step {{ stepIndex + 1 }} of {{ wizardSteps.length }}: {{ wizardSteps[stepIndex]?.title }}
     </h2>
 
-    <div v-if="showResumePrompt" class="mb-4 rounded-2xl border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+    <div v-if="showResumePrompt" class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
       <p class="text-sm font-medium text-blue-800 dark:text-blue-200">
         You have an unsaved draft from a previous session. Would you like to resume?
       </p>
       <div class="mt-3 flex gap-2">
-        <el-button type="primary" size="small" @click="resumeDraft">Resume Draft</el-button>
-        <el-button size="small" @click="discardDraft">Start Fresh</el-button>
+        <el-button type="primary" @click="resumeDraft">Resume Draft</el-button>
+        <el-button @click="clearDraft">Start Fresh</el-button>
       </div>
     </div>
 
     <el-form
       ref="formRef"
-      class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2"
+      class="grid grid-cols-1 gap-4 md:grid-cols-2"
       label-position="top"
       :model="form"
       :rules="rules"
-      v-loading="loadingExisting"
     >
       <template v-if="stepIndex === 0">
         <el-form-item prop="dateReceived" data-test="application-date">
@@ -960,25 +935,25 @@ watch(
           <el-input v-else v-model="form[field.key]" :data-test="getFieldDataTest(field.key)" />
         </el-form-item>
 
-        <div v-if="isSfccService" class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
+        <div v-if="isSfccService" class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50 md:col-span-2">
           <div class="flex items-center justify-between">
             <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Submitted Contracts</h3>
-            <el-button size="small" type="primary" plain @click="addContract">Add Contract</el-button>
+            <el-button type="primary" plain @click="addContract">Add Contract</el-button>
           </div>
 
-          <div v-for="(contract, index) in form.contracts" :key="`ctr-${index}`" class="grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-white p-3 md:grid-cols-2">
+          <div v-for="(contract, index) in form.contracts" :key="`ctr-${index}`" class="grid grid-cols-1 gap-3 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800 p-3 md:grid-cols-2">
             <el-input v-model="contract.contractName" placeholder="Contract Name" />
             <el-input v-model="contract.contractCategory" placeholder="Contract Category" />
             <el-input v-model="contract.language" placeholder="Language" />
             <el-input-number v-model="contract.pages" :min="1" controls-position="right" placeholder="Pages" />
             <el-input v-model="contract.notes" class="md:col-span-2" placeholder="Contract notes" />
             <div class="md:col-span-2">
-              <el-button size="small" type="danger" plain @click="removeContract(index)">Remove Contract</el-button>
+              <el-button type="danger" plain @click="removeContract(index)">Remove Contract</el-button>
             </div>
           </div>
         </div>
 
-        <div v-if="isMergerService" class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
+        <div v-if="isMergerService" class="space-y-3 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50 md:col-span-2">
           <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Merger Notification (FCC-8)</h3>
           <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
             <el-form-item prop="mergerClearance.transactionType" class="mb-0">
@@ -1103,21 +1078,21 @@ watch(
           </div>
         </div>
 
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50 md:col-span-2">
           <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Application Fees Breakdown</h3>
           <ul class="mt-2 space-y-2 text-sm">
             <li v-for="row in calculatedFees.breakdown" :key="row.lineId" class="flex items-center justify-between rounded-md bg-white px-3 py-2">
               <span>{{ row.label }}</span>
               <span class="font-semibold">{{ Number(row.amount || 0).toLocaleString() }} {{ calculatedFees.currency }}</span>
             </li>
-            <li class="flex items-center justify-between border-t border-slate-200 px-1 pt-2 font-semibold">
+            <li class="flex items-center justify-between border-t border-slate-200 dark:border-slate-700 px-1 pt-2 font-semibold">
               <span>Total</span>
               <span>{{ Number(calculatedFees.total || 0).toLocaleString() }} {{ calculatedFees.currency }}</span>
             </li>
           </ul>
         </div>
 
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 md:col-span-2">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50 md:col-span-2">
           <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Planning References</h3>
           <div class="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">
             <el-input v-model="form.activity" placeholder="Activity ID / Reference" />
@@ -1136,26 +1111,6 @@ watch(
       </template>
     </el-form>
 
-    <div class="mt-2 flex items-center gap-2">
-      <el-button v-if="stepIndex > 0" @click="previousStep">Previous</el-button>
-      <el-button v-if="stepIndex < wizardSteps.length - 1" type="primary" @click="nextStep">Next</el-button>
-      <el-button v-else type="primary" :loading="submitting" data-test="application-submit" @click="submit">
-        {{ isEditMode ? 'Save Updates' : 'Submit Application' }}
-      </el-button>
-      <span v-if="lastSaved" class="text-xs text-slate-400 dark:text-slate-500">
-        Draft saved {{ new Date(lastSaved).toLocaleTimeString() }}
-      </span>
-    </div>
-    </template>
-
-    <button
-      class="fixed bottom-6 right-6 z-40 flex h-12 items-center gap-2 rounded-2xl bg-fcc-brand px-5 text-sm font-semibold text-white shadow-lg transition hover:bg-fcc-brand/90"
-      @click="previewDrawerVisible = true"
-    >
-      <i class="fa-solid fa-eye" />
-      Preview
-    </button>
-
     <ApplicationCompletenessDrawer
       :visible="previewDrawerVisible"
       :service-key="serviceKey"
@@ -1165,5 +1120,5 @@ watch(
       @jump-to-step="jumpToStep"
       @open-full-preview="openFullPreview"
     />
-  </section>
+  </WizardShell>
 </template>

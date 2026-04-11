@@ -1,5 +1,6 @@
 <script setup>
 import { inject } from 'vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { CONTRACT_TYPES, CONSIDERATION_FORMS } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -23,7 +24,7 @@ const form = inject('wizardForm')
         />
       </el-form-item>
 
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Contract Type" required>
           <el-select
             :model-value="get('acquisition.natureAndDetails.contractType')"
@@ -54,11 +55,11 @@ const form = inject('wizardForm')
             class="!w-full"
           />
         </el-form-item>
-      </div>
+      </SmartFormGrid>
 
       <!-- Consideration -->
       <h4 class="merger-field-group-title">Consideration</h4>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <SmartFormGrid :max-cols="3">
         <el-form-item label="Amount">
           <el-input-number
             :model-value="get('acquisition.natureAndDetails.consideration.amount')"
@@ -84,10 +85,10 @@ const form = inject('wizardForm')
             <el-option v-for="o in CONSIDERATION_FORMS" :key="o.value" :label="o.label" :value="o.value" />
           </el-select>
         </el-form-item>
-      </div>
+      </SmartFormGrid>
 
       <!-- Attachments checkboxes -->
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
+      <SmartFormGrid :max-cols="2" class="mt-3">
         <el-checkbox
           :model-value="get('acquisition.natureAndDetails.contractCopyAttached')"
           @update:model-value="v => set('acquisition.natureAndDetails.contractCopyAttached', v)"
@@ -100,7 +101,7 @@ const form = inject('wizardForm')
         >
           Public offer document attached
         </el-checkbox>
-      </div>
+      </SmartFormGrid>
     </div>
 
     <!-- 3(b) Commercial Rationale -->

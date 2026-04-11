@@ -7,7 +7,7 @@ const form = inject('wizardForm')
 const fields = [
   { key: 'companyName', label: 'Company Name', required: true },
   { key: 'relationship', label: 'Relationship', required: true, placeholder: 'e.g. Subsidiary, Licensee' },
-  { key: 'country', label: 'Country' },
+  { key: 'country', label: 'Country', type: 'country' },
   { key: 'notes', label: 'Notes', type: 'textarea', fullWidth: true }
 ]
 
@@ -21,11 +21,8 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Affiliated Companies</h3>
-      <p class="wizard-step__description">
         List any companies affiliated with the trademark owner (subsidiaries, licensees, etc.).
         This section is optional.
-      </p>
     </div>
 
     <TableFormManager

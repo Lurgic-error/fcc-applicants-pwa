@@ -1739,7 +1739,11 @@ export async function fetchApplicantProfile({ email = '', userId = '' } = {}) {
       countryOfIncorporation: 'Tanzania',
       postalAddress: 'P.O. Box 100, Dar es Salaam',
       physicalAddress: 'Dar es Salaam',
-      businessDescription: 'Consumer services provider'
+      businessDescription: 'Consumer services provider',
+      applicantType: 'company',
+      displayName: 'Example Business Ltd',
+      isCompanyApplicant: true,
+      isIndividualApplicant: false
     }
   }
 
@@ -1754,7 +1758,15 @@ export async function fetchApplicantProfile({ email = '', userId = '' } = {}) {
       applicant,
       profile: resolvedProfile,
       applicantId: applicant?.applicantId || user?.attributes?.custom?.applicantId || null,
-      applicantType: applicant?.type || 'firm',
+      applicantType: applicant?.type || 'individual',
+      displayName: (() => {
+        if (applicant?.type === 'company') return applicant?.company?.name || applicant?.companyName || ''
+        const first = applicant?.individual?.firstName || applicant?.firstName || ''
+        const last = applicant?.individual?.surname || applicant?.surname || ''
+        return `${first} ${last}`.trim() || user?.fullName || ''
+      })(),
+      isCompanyApplicant: applicant?.type === 'company',
+      isIndividualApplicant: applicant?.type !== 'company',
       userId: user?.userId || userId || null,
       fullName: user?.fullName || applicant?.contactPerson?.name || '',
       email: user?.email || applicant?.email || email || '',
@@ -1801,7 +1813,15 @@ export async function fetchApplicantProfile({ email = '', userId = '' } = {}) {
     applicant,
     profile,
     applicantId: applicantFromProfile.applicantId || applicant?.applicantId || null,
-    applicantType: applicantFromProfile.type || 'firm',
+    applicantType: applicantFromProfile.type || 'individual',
+    displayName: (() => {
+      if (applicantFromProfile?.type === 'company') return applicantFromProfile?.company?.name || applicantFromProfile?.companyName || ''
+      const first = applicantFromProfile?.individual?.firstName || applicantFromProfile?.firstName || ''
+      const last = applicantFromProfile?.individual?.surname || applicantFromProfile?.surname || ''
+      return `${first} ${last}`.trim() || ''
+    })(),
+    isCompanyApplicant: applicantFromProfile?.type === 'company',
+    isIndividualApplicant: applicantFromProfile?.type !== 'company',
     userId: userId || null,
     fullName: applicantFromProfile.contactPerson?.name || '',
     email: effectiveEmail || applicantFromProfile.email || '',

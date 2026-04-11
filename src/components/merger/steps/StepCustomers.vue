@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 import MergerArrayManager from '@/components/merger/MergerArrayManager.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { SIZES, SUPPLIES_TO_OPTIONS, mk } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -15,7 +16,7 @@ const form = inject('wizardForm')
     <MergerArrayManager path="customers.customers" title="Customer" :factory="mk.customer">
       <template #default="{ item, path: itemPath }">
         <div class="space-y-4">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <SmartFormGrid :max-cols="2">
             <el-form-item label="Customer Name" required>
               <el-input
                 :model-value="item.name"
@@ -42,7 +43,7 @@ const form = inject('wizardForm')
                 <el-option v-for="o in SUPPLIES_TO_OPTIONS" :key="o.value" :label="o.label" :value="o.value" />
               </el-select>
             </el-form-item>
-          </div>
+          </SmartFormGrid>
 
           <el-form-item label="Goods and Services Purchased">
             <el-input
@@ -54,7 +55,7 @@ const form = inject('wizardForm')
             />
           </el-form-item>
 
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <SmartFormGrid :max-cols="2">
             <el-form-item label="Value of Purchases">
               <el-input-number
                 :model-value="item.valueOfPurchases"
@@ -70,11 +71,11 @@ const form = inject('wizardForm')
                 placeholder="TZS"
               />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
 
           <!-- Contact Details -->
           <h4 class="merger-field-group-title">Contact Details</h4>
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <SmartFormGrid :max-cols="2">
             <el-form-item label="Contact Person">
               <el-input
                 :model-value="item.contactDetails.contactPerson"
@@ -100,7 +101,7 @@ const form = inject('wizardForm')
                 @update:model-value="v => set(`${itemPath}.contactDetails.address`, v)"
               />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </div>
       </template>
     </MergerArrayManager>

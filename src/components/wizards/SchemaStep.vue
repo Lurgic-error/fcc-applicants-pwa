@@ -1,4 +1,6 @@
 <script setup>
+import { computed } from 'vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import SchemaField from './SchemaField.vue'
 import RepeatableGroup from './RepeatableGroup.vue'
 
@@ -9,6 +11,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:formData'])
+const gridMaxCols = computed(() => props.step?.maxCols || 4)
 
 function updateField(key, value) {
   emit('update:formData', { ...props.formData, [key]: value })
@@ -25,7 +28,7 @@ function updateGroup(key, value) {
       {{ step.description }}
     </div>
 
-    <div class="grid gap-4 md:grid-cols-2">
+    <SmartFormGrid :max-cols="gridMaxCols">
       <SchemaField
         v-for="field in (step.structuredFields || [])"
         :key="field.key"
@@ -34,7 +37,7 @@ function updateGroup(key, value) {
         :disabled="disabled"
         @update:model-value="updateField(field.key, $event)"
       />
-    </div>
+    </SmartFormGrid>
 
     <div v-if="(step.repeatableGroups || []).length" class="mt-6 space-y-6">
       <RepeatableGroup

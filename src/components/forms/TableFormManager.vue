@@ -8,6 +8,7 @@
 import { ref, computed } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 
 const props = defineProps({
   modelValue: { type: Array, default: () => [] },
@@ -141,6 +142,14 @@ function isFullWidth(field) {
               clearable
             />
 
+            <!-- country -->
+            <CountrySelect
+              v-else-if="field.type === 'country'"
+              v-model="form[field.key]"
+              :placeholder="field.placeholder || 'Select country'"
+              :class="{ 'is-error': formErrors[field.key] }"
+            />
+
             <!-- textarea -->
             <el-input
               v-else-if="field.type === 'textarea'"
@@ -226,7 +235,7 @@ function isFullWidth(field) {
           <el-button
             type="danger"
             text
-            size="small"
+           
             @click.stop="handleDelete($index)"
           >
             Remove

@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 
 const form = inject('wizardForm')
 </script>
@@ -8,10 +9,7 @@ const form = inject('wizardForm')
 <template>
   <div class="space-y-6">
     <div>
-      <h3 class="wizard-step__title">Applicant Identity</h3>
-      <p class="wizard-step__description">
         Provide details about the party submitting this request.
-      </p>
     </div>
 
     <el-form label-position="top">
@@ -42,7 +40,7 @@ const form = inject('wizardForm')
             <el-input v-model="form.registrationNumber" placeholder="Company registration number" clearable />
           </el-form-item>
           <el-form-item label="Country of Incorporation">
-            <el-input v-model="form.countryOfIncorporation" placeholder="Country" clearable />
+            <CountrySelect v-model="form.countryOfIncorporation" />
           </el-form-item>
         </SmartFormGrid>
       </template>
@@ -60,7 +58,7 @@ const form = inject('wizardForm')
             <el-input v-model="form.nationalId" placeholder="ID or passport number" clearable />
           </el-form-item>
           <el-form-item label="Nationality / Country of Residence">
-            <el-input v-model="form.countryOfResidence" placeholder="Country" clearable />
+            <CountrySelect v-model="form.countryOfResidence" />
           </el-form-item>
         </SmartFormGrid>
       </template>

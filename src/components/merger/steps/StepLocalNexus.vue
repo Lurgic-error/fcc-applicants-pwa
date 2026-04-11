@@ -1,7 +1,9 @@
 <script setup>
 import { inject } from 'vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 import MergerAddressFields from '@/components/merger/MergerAddressFields.vue'
 import MergerArrayManager from '@/components/merger/MergerArrayManager.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { LOCAL_NEXUS_RELATIONSHIPS, mk } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -19,7 +21,7 @@ const form = inject('wizardForm')
     <!-- Company Identity -->
     <div>
       <h3 class="merger-subsection-title">Local Nexus Entity</h3>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Company Name" required>
           <el-input
             :model-value="get('localNexus.companyName')"
@@ -64,7 +66,7 @@ const form = inject('wizardForm')
             :min="0" :max="100" class="!w-full"
           />
         </el-form-item>
-      </div>
+      </SmartFormGrid>
     </div>
 
     <!-- Registered Office -->
@@ -109,7 +111,7 @@ const form = inject('wizardForm')
       <h3 class="merger-subsection-title">Ownership Structure</h3>
       <MergerArrayManager path="localNexus.ownershipStructure.shareholders" title="Shareholder" :factory="mk.shareholder">
         <template #default="{ item, path: itemPath }">
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+          <SmartFormGrid :max-cols="4">
             <el-form-item label="Name">
               <el-input :model-value="item.name" @update:model-value="v => set(`${itemPath}.name`, v)" />
             </el-form-item>
@@ -124,9 +126,9 @@ const form = inject('wizardForm')
               <el-input :model-value="item.shareType" @update:model-value="v => set(`${itemPath}.shareType`, v)" placeholder="Ordinary" />
             </el-form-item>
             <el-form-item label="Nationality">
-              <el-input :model-value="item.nationality" @update:model-value="v => set(`${itemPath}.nationality`, v)" />
+              <CountrySelect :model-value="item.nationality" @update:model-value="v => set(`${itemPath}.nationality`, v)" placeholder="Select nationality" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </template>
       </MergerArrayManager>
     </div>

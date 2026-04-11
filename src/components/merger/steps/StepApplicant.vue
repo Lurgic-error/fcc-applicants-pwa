@@ -1,6 +1,8 @@
 <script setup>
 import { inject } from 'vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 import MergerAddressFields from '@/components/merger/MergerAddressFields.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { APPLICANT_TYPES, APPLICANT_ROLES } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -13,7 +15,7 @@ const form = inject('wizardForm')
     <!-- Identity -->
     <div>
       <h3 class="merger-subsection-title">Identity</h3>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Applicant Type" required>
           <el-select :model-value="form.applicant.applicantType" @update:model-value="v => set('applicant.applicantType', v)" class="w-full" placeholder="Select...">
             <el-option v-for="o in APPLICANT_TYPES" :key="o.value" :label="o.label" :value="o.value" />
@@ -30,13 +32,13 @@ const form = inject('wizardForm')
             <el-option label="Target Side" value="targetSide" />
           </el-select>
         </el-form-item>
-      </div>
+      </SmartFormGrid>
     </div>
 
     <!-- Individual Details -->
     <div v-if="form.applicant.applicantType === 'individual'">
       <h3 class="merger-subsection-title">Individual Details</h3>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Full Name" required>
           <el-input :model-value="get('applicant.individualDetails.fullName')" @update:model-value="v => set('applicant.individualDetails.fullName', v)" />
         </el-form-item>
@@ -44,7 +46,7 @@ const form = inject('wizardForm')
           <el-input :model-value="get('applicant.individualDetails.nationalId')" @update:model-value="v => set('applicant.individualDetails.nationalId', v)" />
         </el-form-item>
         <el-form-item label="Nationality">
-          <el-input :model-value="get('applicant.individualDetails.nationality')" @update:model-value="v => set('applicant.individualDetails.nationality', v)" />
+          <CountrySelect :model-value="get('applicant.individualDetails.nationality')" @update:model-value="v => set('applicant.individualDetails.nationality', v)" placeholder="Select nationality" />
         </el-form-item>
         <el-form-item label="Occupation">
           <el-input :model-value="get('applicant.individualDetails.occupation')" @update:model-value="v => set('applicant.individualDetails.occupation', v)" />
@@ -55,7 +57,7 @@ const form = inject('wizardForm')
         <el-form-item label="Email">
           <el-input :model-value="get('applicant.individualDetails.email')" @update:model-value="v => set('applicant.individualDetails.email', v)" type="email" />
         </el-form-item>
-      </div>
+      </SmartFormGrid>
       <h4 class="merger-field-group-title">Physical Address</h4>
       <MergerAddressFields path="applicant.individualDetails.physicalAddress" />
     </div>
@@ -63,7 +65,7 @@ const form = inject('wizardForm')
     <!-- Company / Law Firm Details -->
     <div v-if="form.applicant.applicantType === 'company' || form.applicant.applicantType === 'lawFirm'">
       <h3 class="merger-subsection-title">{{ form.applicant.applicantType === 'lawFirm' ? 'Law Firm' : 'Company' }} Details</h3>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Name" required>
           <el-input :model-value="get('applicant.companyDetails.companyName')" @update:model-value="v => set('applicant.companyDetails.companyName', v)" />
         </el-form-item>
@@ -73,11 +75,11 @@ const form = inject('wizardForm')
         <el-form-item label="Place of Incorporation">
           <el-input :model-value="get('applicant.companyDetails.placeOfIncorporation')" @update:model-value="v => set('applicant.companyDetails.placeOfIncorporation', v)" />
         </el-form-item>
-      </div>
+      </SmartFormGrid>
       <h4 class="merger-field-group-title">Registered Office</h4>
       <MergerAddressFields path="applicant.companyDetails.registeredOffice" />
       <h4 class="merger-field-group-title">Contact Person</h4>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Full Name">
           <el-input :model-value="get('applicant.companyDetails.contactPerson.fullName')" @update:model-value="v => set('applicant.companyDetails.contactPerson.fullName', v)" />
         </el-form-item>
@@ -90,7 +92,7 @@ const form = inject('wizardForm')
         <el-form-item label="Email">
           <el-input :model-value="get('applicant.companyDetails.contactPerson.email')" @update:model-value="v => set('applicant.companyDetails.contactPerson.email', v)" type="email" />
         </el-form-item>
-      </div>
+      </SmartFormGrid>
     </div>
 
     <!-- Tanzania Service Address -->

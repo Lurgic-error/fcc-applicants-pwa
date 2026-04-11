@@ -332,14 +332,16 @@ onMounted(async () => {
 
       <main ref="contentRef" class="trademark-wizard__content">
         <div class="trademark-wizard__content-inner">
-          <h2
-            ref="stepHeadingRef"
-            tabindex="-1"
-            class="trademark-wizard__step-heading"
-          >
-            {{ currentStepLabel }}
-          </h2>
-          <component :is="currentComponent" v-if="currentComponent" />
+          <div class="trademark-wizard__card">
+            <div class="trademark-wizard__step-header">
+              <h2
+                ref="stepHeadingRef"
+                tabindex="-1"
+                class="trademark-wizard__step-title outline-none"
+              >{{ currentStepLabel }}</h2>
+            </div>
+            <component :is="currentComponent" v-if="currentComponent" />
+          </div>
         </div>
       </main>
     </div>
@@ -369,10 +371,17 @@ onMounted(async () => {
 .trademark-wizard {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh; /* dynamic viewport height for mobile browsers */
-  overflow: hidden; /* NEVER scrolls */
+  overflow: hidden;
   background: var(--el-bg-color-page, #f5f7fa);
+  margin: -1rem -1rem -1.5rem;
+  height: calc(100% + 1rem + 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .trademark-wizard {
+    margin: -1.5rem;
+    height: calc(100% + 3rem);
+  }
 }
 
 .trademark-wizard__header {
@@ -448,11 +457,27 @@ onMounted(async () => {
 .trademark-wizard__content-inner {
 }
 
-.trademark-wizard__step-heading {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--el-text-color-primary);
-  margin: 0 0 0.25rem;
+.trademark-wizard__card {
+  background: var(--fcc-bg-surface, #fff);
+  border: 1px solid var(--fcc-border, #dbe3ef);
+  border-radius: var(--fcc-radius-panel, 10px);
+  padding: 1.75rem 2rem;
+  box-shadow: var(--fcc-shadow-sm);
+}
+
+.trademark-wizard__step-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1.5px solid var(--fcc-border, #dbe3ef);
+}
+
+.trademark-wizard__step-title {
+  margin: 0;
+  font-family: var(--fcc-font-heading, 'Outfit', sans-serif);
+  font-size: var(--fcc-text-xl, 1.125rem);
+  font-weight: 800;
+  color: var(--fcc-text-primary, #0f172a);
+  letter-spacing: -0.02em;
   line-height: 1.4;
   outline: none;
 }
@@ -525,5 +550,27 @@ onMounted(async () => {
   background: var(--el-color-success-light-9, #f0f9eb);
   color: var(--el-color-success-dark-2);
   border-color: var(--el-color-success-light-5, #b3e19d);
+}
+
+/* ── Scrollbar ── */
+.trademark-wizard__content::-webkit-scrollbar,
+.wizard-sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.trademark-wizard__content::-webkit-scrollbar-track,
+.wizard-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.trademark-wizard__content::-webkit-scrollbar-thumb,
+.wizard-sidebar__nav::-webkit-scrollbar-thumb {
+  background: var(--fcc-border);
+  border-radius: 3px;
+}
+
+.trademark-wizard__content::-webkit-scrollbar-thumb:hover,
+.wizard-sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: var(--fcc-border-strong);
 }
 </style>

@@ -85,10 +85,10 @@ function fmt(value) {
 
 <style scoped>
 .fee-summary {
-  border: 1px solid var(--el-border-color);
-  border-radius: 8px;
+  border: 1px solid var(--fcc-border);
+  border-radius: var(--fcc-radius-lg, 8px);
   padding: 16px;
-  background: #fff;
+  background: var(--fcc-bg-surface);
 }
 
 .fee-summary__header {
@@ -100,7 +100,7 @@ function fmt(value) {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: var(--el-text-color-secondary);
+  color: var(--fcc-text-muted);
 }
 
 .fee-summary__table {
@@ -114,8 +114,8 @@ function fmt(value) {
   padding: 6px 8px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--el-text-color-secondary);
-  border-bottom: 1px solid var(--el-border-color-lighter);
+  color: var(--fcc-text-muted);
+  border-bottom: 1px solid var(--fcc-border-light);
 }
 
 .fee-summary__th--amount,
@@ -131,24 +131,24 @@ function fmt(value) {
 
 .fee-summary__label {
   font-weight: 500;
-  color: var(--el-text-color-primary);
+  color: var(--fcc-text-primary);
 }
 
 .fee-summary__description {
   font-size: 12px;
-  color: var(--el-text-color-secondary);
+  color: var(--fcc-text-muted);
   margin-top: 2px;
 }
 
 .fee-summary__empty {
   padding: 16px 8px;
-  color: var(--el-text-color-secondary);
+  color: var(--fcc-text-muted);
   font-style: italic;
   text-align: center;
 }
 
 .fee-summary__divider {
-  border-top: 1px solid var(--el-border-color);
+  border-top: 1px solid var(--fcc-border);
   margin: 8px 0;
 }
 
@@ -164,21 +164,21 @@ function fmt(value) {
   justify-content: space-between;
   align-items: center;
   padding: 2px 8px;
-  color: var(--el-text-color-primary);
+  color: var(--fcc-text-primary);
 }
 
 .fee-summary__total-row--grand {
   font-weight: 700;
   font-size: 15px;
   padding-top: 4px;
-  border-top: 1px solid var(--el-border-color-lighter);
+  border-top: 1px solid var(--fcc-border-light);
   margin-top: 4px;
 }
 
 .fee-summary__currency-label {
   text-align: right;
   font-size: 11px;
-  color: var(--el-text-color-secondary);
+  color: var(--fcc-text-muted);
   margin-top: 8px;
 }
 </style>

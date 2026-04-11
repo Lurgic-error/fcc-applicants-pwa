@@ -16,10 +16,7 @@ const requiredDocs = computed(() =>
 <template>
   <div class="space-y-5">
     <div>
-      <h3 class="wizard-step__title">Documents & Attachments</h3>
-      <p class="wizard-step__description">
         Upload all required supporting documents for your request.
-      </p>
     </div>
 
     <!-- Required documents info box -->

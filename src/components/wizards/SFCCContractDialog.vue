@@ -1,5 +1,6 @@
 <script setup>
 import { reactive, watch } from 'vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 
 const props = defineProps({
   visible: {
@@ -73,43 +74,45 @@ function save() {
     @close="close"
   >
     <el-form :model="form" label-position="top">
-      <el-form-item label="Purpose" prop="purpose">
-        <el-select v-model="form.purpose" placeholder="Select purpose">
-          <el-option label="First Registration" value="First Registration" />
-          <el-option label="Renewal" value="Renewal" />
-          <el-option label="Amendment" value="Amendment" />
-          <el-option label="Variation" value="Variation" />
-        </el-select>
-      </el-form-item>
+      <SmartFormGrid :max-cols="2">
+        <el-form-item label="Purpose" prop="purpose">
+          <el-select v-model="form.purpose" placeholder="Select purpose">
+            <el-option label="First Registration" value="First Registration" />
+            <el-option label="Renewal" value="Renewal" />
+            <el-option label="Amendment" value="Amendment" />
+            <el-option label="Variation" value="Variation" />
+          </el-select>
+        </el-form-item>
 
-      <el-form-item label="Contract Title" prop="title" required>
-        <el-input v-model="form.title" placeholder="e.g. Standard Consumer Purchase Agreement" />
-      </el-form-item>
+        <el-form-item label="Contract Title" prop="title" required>
+          <el-input v-model="form.title" placeholder="e.g. Standard Consumer Purchase Agreement" />
+        </el-form-item>
 
-      <el-form-item label="Contract Description" prop="description">
-        <el-input
-          v-model="form.description"
-          type="textarea"
-          :rows="3"
-          placeholder="Brief description of the contract's scope and purpose"
-        />
-      </el-form-item>
+        <el-form-item label="Contract Description" prop="description" class="col-span-full" full-width>
+          <el-input
+            v-model="form.description"
+            type="textarea"
+            :rows="3"
+            placeholder="Brief description of the contract's scope and purpose"
+          />
+        </el-form-item>
 
-      <el-form-item label="Parties Involved" prop="partiesInvolved">
-        <el-input
-          v-model="form.partiesInvolved"
-          placeholder="e.g. Company Ltd and Consumer"
-        />
-      </el-form-item>
+        <el-form-item label="Parties Involved" prop="partiesInvolved">
+          <el-input
+            v-model="form.partiesInvolved"
+            placeholder="e.g. Company Ltd and Consumer"
+          />
+        </el-form-item>
 
-      <el-form-item label="Effective Date" prop="effectiveDate">
-        <el-date-picker
-          v-model="form.effectiveDate"
-          type="date"
-          value-format="YYYY-MM-DD"
-          placeholder="Select effective date"
-        />
-      </el-form-item>
+        <el-form-item label="Effective Date" prop="effectiveDate">
+          <el-date-picker
+            v-model="form.effectiveDate"
+            type="date"
+            value-format="YYYY-MM-DD"
+            placeholder="Select effective date"
+          />
+        </el-form-item>
+      </SmartFormGrid>
     </el-form>
 
     <template #footer>

@@ -70,12 +70,9 @@ async function handleVerifyPayment(controlNumber) {
 <template>
   <div class="space-y-6">
     <div>
-      <h3 class="wizard-step__title">Payment & Declaration</h3>
-      <p class="wizard-step__description">
         Pay the statutory fee via GePG (Government e-Payment Gateway): generate a control number,
         pay at any bank or mobile money service, then verify the payment here. Once confirmed,
         sign the declaration and submit.
-      </p>
     </div>
 
     <!-- Payment section -->
@@ -106,8 +103,8 @@ async function handleVerifyPayment(controlNumber) {
     <section class="space-y-4">
       <h3 class="wizard-step__section-title">Declaration</h3>
 
-      <div class="wizard-step__declaration-box">
-        <el-checkbox v-model="form.declarationAccepted" size="large">
+      <div class="wizard-step__declaration-box wizard-declaration-box">
+        <el-checkbox v-model="form.declarationAccepted" size="large" class="wizard-declaration-checkbox">
           I declare that the information provided in this application is true, complete, and accurate
           to the best of my knowledge. I understand that any false declaration may result in
           rejection or revocation of the recordation.

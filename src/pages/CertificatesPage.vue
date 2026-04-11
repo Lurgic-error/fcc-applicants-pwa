@@ -245,7 +245,7 @@ function handleExport(format) {
           </el-input>
           <span class="text-sm text-slate-500 dark:text-slate-400">{{ filteredCertificateRows.length }} certificates</span>
           <el-dropdown trigger="click" @command="handleExport">
-            <el-button plain size="small">
+            <el-button plain>
               <i class="fa-solid fa-download mr-2" />Export
             </el-button>
             <template #dropdown>

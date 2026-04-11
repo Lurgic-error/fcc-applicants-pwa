@@ -83,7 +83,7 @@ onUnmounted(() => {
   >
     <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3 dark:border-slate-700">
       <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100" id="notifications-heading">Notifications</h3>
-      <el-button v-if="notifStore.unreadCount > 0" link type="primary" size="small" @click="notifStore.markAllAsRead()">
+      <el-button v-if="notifStore.unreadCount > 0" link type="primary" @click="notifStore.markAllAsRead()">
         Mark all read
       </el-button>
     </div>

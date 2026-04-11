@@ -4,6 +4,7 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApplicantDataStore } from '@/stores/applications'
 import { useAuthStore } from '@/stores/auth'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 
 const router = useRouter()
 const dataStore = useApplicantDataStore()
@@ -110,7 +111,7 @@ async function submit() {
       </el-form-item>
 
       <el-form-item label="Country Of Incorporation" prop="countryOfIncorporation">
-        <el-input v-model="form.countryOfIncorporation" data-test="application-country" />
+        <CountrySelect v-model="form.countryOfIncorporation" data-test="application-country" placeholder="Select country of incorporation" />
       </el-form-item>
 
       <el-form-item label="Contact Email" prop="contactEmail">

@@ -7,7 +7,7 @@ const form = inject('wizardForm')
 const fields = [
   { key: 'name', label: 'Manufacturer Name', required: true },
   { key: 'address', label: 'Address' },
-  { key: 'country', label: 'Country' },
+  { key: 'country', label: 'Country', type: 'country' },
   { key: 'contactName', label: 'Contact Person Name' },
   { key: 'contactPhone', label: 'Contact Phone' },
   { key: 'notes', label: 'Notes', type: 'textarea', fullWidth: true }
@@ -23,11 +23,8 @@ const columns = [
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Manufacturers</h3>
-      <p class="wizard-step__description">
         List the manufacturers or production facilities associated with goods bearing this trademark.
         This section is optional.
-      </p>
     </div>
 
     <TableFormManager

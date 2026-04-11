@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 
 const form = inject('wizardForm')
 </script>
@@ -8,10 +9,7 @@ const form = inject('wizardForm')
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Trademark Details</h3>
-      <p class="wizard-step__description">
         Provide registration and classification information for the trademark.
-      </p>
     </div>
 
     <el-form label-position="top">
@@ -41,11 +39,7 @@ const form = inject('wizardForm')
         </el-form-item>
 
         <el-form-item label="Country of Origin">
-          <el-input
-            v-model="form.trademark.countryOfOrigin"
-            placeholder="Country where trademark is registered"
-            clearable
-          />
+          <CountrySelect v-model="form.trademark.countryOfOrigin" />
         </el-form-item>
 
         <el-form-item label="Registration Reference">

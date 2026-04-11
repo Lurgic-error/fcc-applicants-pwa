@@ -9,8 +9,6 @@ import { computed } from 'vue'
 const props = defineProps({
   steps: { type: Array, required: true },
   currentStepKey: { type: String, required: true },
-  title: { type: String, required: true },
-  subtitle: { type: String, default: '' }
 })
 
 const emit = defineEmits(['step-click'])
@@ -59,12 +57,6 @@ function childNum(parentIndex, childIndex) {
 
 <template>
   <aside class="wizard-sidebar">
-    <!-- Header: title / subtitle -->
-    <div class="wizard-sidebar__header">
-      <p class="wizard-sidebar__title">{{ title }}</p>
-      <p v-if="subtitle" class="wizard-sidebar__subtitle">{{ subtitle }}</p>
-    </div>
-
     <!-- Progress bar -->
     <div class="wizard-sidebar__progress">
       <div class="wizard-sidebar__progress-bar">
@@ -144,53 +136,31 @@ function childNum(parentIndex, childIndex) {
 .wizard-sidebar {
   width: 16rem;
   min-width: 16rem;
-  background: var(--el-bg-color, #fff);
-  border-right: 1px solid var(--el-border-color-lighter, #ebeef5);
+  background: var(--fcc-bg-surface, #fff);
+  border-right: 1px solid var(--fcc-border, #dbe3ef);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  /* NO position: sticky, NO height: 100vh — flex parent controls this */
-}
-
-/* ── Header ──────────────────────────────────────────────────────────────── */
-.wizard-sidebar__header {
-  padding: 1rem 1rem 0.75rem;
-  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
-  flex-shrink: 0;
-}
-
-.wizard-sidebar__title {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--el-text-color-primary);
-  margin: 0;
-}
-
-.wizard-sidebar__subtitle {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--el-text-color-secondary);
-  margin: 0.125rem 0 0;
 }
 
 /* ── Progress ────────────────────────────────────────────────────────────── */
 .wizard-sidebar__progress {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--el-border-color-lighter, #ebeef5);
+  border-bottom: 1px solid var(--fcc-border-light, #f1f5f9);
   flex-shrink: 0;
 }
 
 .wizard-sidebar__progress-bar {
   height: 4px;
   border-radius: 999px;
-  background: var(--el-fill-color-light, #ebeef5);
+  background: var(--fcc-bg-surface-muted, #f8fafc);
   overflow: hidden;
 }
 
 .wizard-sidebar__progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: var(--el-color-primary);
+  background: var(--fcc-primary-600, #1f569e);
   transition: width 0.3s ease;
 }
 
@@ -198,7 +168,7 @@ function childNum(parentIndex, childIndex) {
   margin: 0.375rem 0 0;
   font-size: 0.6875rem;
   font-weight: 600;
-  color: var(--el-text-color-secondary);
+  color: var(--fcc-text-muted, #64748b);
 }
 
 /* ── Nav ─────────────────────────────────────────────────────────────────── */
@@ -209,6 +179,23 @@ function childNum(parentIndex, childIndex) {
   padding: 0.5rem;
 }
 
+.wizard-sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.wizard-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.wizard-sidebar__nav::-webkit-scrollbar-thumb {
+  background: var(--fcc-border, #dbe3ef);
+  border-radius: 3px;
+}
+
+.wizard-sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: var(--fcc-border-strong, #cbd5e1);
+}
+
 /* ── Step base ───────────────────────────────────────────────────────────── */
 .wizard-sidebar__step {
   display: flex;
@@ -217,23 +204,23 @@ function childNum(parentIndex, childIndex) {
   width: 100%;
   padding: 0.5rem 0.625rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--fcc-radius-base, 4px);
   background: transparent;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
   margin-bottom: 2px;
   transition: background 0.15s, color 0.15s;
-  color: var(--el-text-color-regular);
+  color: var(--fcc-text-secondary, #475569);
 }
 
 .wizard-sidebar__step:hover {
-  background: var(--el-fill-color-light, #f5f7fa);
+  background: var(--fcc-bg-surface-muted, #f8fafc);
 }
 
 .wizard-sidebar__step--active {
-  background: var(--el-color-primary-light-9, #ecf5ff);
-  color: var(--el-color-primary);
+  background: color-mix(in srgb, var(--fcc-primary-500) 10%, transparent);
+  color: var(--fcc-primary-700, #1b4683);
 }
 
 /* ── Parent step header (non-clickable) ──────────────────────────────────── */
@@ -252,7 +239,7 @@ function childNum(parentIndex, childIndex) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  color: var(--el-text-color-secondary);
+  color: var(--fcc-text-muted, #64748b);
 }
 
 /* ── Child step ──────────────────────────────────────────────────────────── */
@@ -264,15 +251,15 @@ function childNum(parentIndex, childIndex) {
 .wizard-sidebar__step-num {
   width: 1.5rem;
   height: 1.5rem;
-  border-radius: 6px;
+  border-radius: var(--fcc-radius-base, 4px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   font-size: 0.6875rem;
   font-weight: 700;
-  background: var(--el-fill-color, #f0f2f5);
-  color: var(--el-text-color-secondary);
+  background: var(--fcc-bg-surface-muted, #f8fafc);
+  color: var(--fcc-text-muted, #64748b);
   transition: background 0.15s, color 0.15s;
 }
 
@@ -280,17 +267,16 @@ function childNum(parentIndex, childIndex) {
   width: 1.25rem;
   height: 1.25rem;
   font-size: 0.625rem;
-  border-radius: 4px;
 }
 
 .wizard-sidebar__step--active .wizard-sidebar__step-num {
-  background: var(--el-color-primary);
+  background: var(--fcc-primary-900, #0f4c81);
   color: #fff;
 }
 
 .wizard-sidebar__step--done .wizard-sidebar__step-num {
-  background: var(--el-color-success-light-9, #f0f9eb);
-  color: var(--el-color-success, #67c23a);
+  background: color-mix(in srgb, var(--fcc-success) 12%, transparent);
+  color: var(--fcc-success, #16a34a);
 }
 
 /* ── Step text ───────────────────────────────────────────────────────────── */
@@ -310,11 +296,11 @@ function childNum(parentIndex, childIndex) {
 
 .wizard-sidebar__step--active .wizard-sidebar__step-label {
   font-weight: 700;
-  color: var(--el-color-primary);
+  color: var(--fcc-primary-700, #1b4683);
 }
 
 .wizard-sidebar__step--done .wizard-sidebar__step-label {
-  color: var(--el-text-color-regular);
+  color: var(--fcc-text-secondary, #475569);
 }
 
 /* ── Mobile: hide sidebar ────────────────────────────────────────────────── */

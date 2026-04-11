@@ -4,9 +4,6 @@ import { FccStatusBadge as StatusBadge, FccPageHeader, FccStatCard, FccSectionHe
 import { useApplicantDataStore } from '@/stores/applications'
 import { useApplicantServiceCatalogStore } from '@/stores/serviceCatalog'
 import OnboardingOverlay from '@/components/OnboardingOverlay.vue'
-import ApplicationsInsightsPanel from '@/components/applications/ApplicationsInsightsPanel.vue'
-import { OVERVIEW_INSIGHTS } from '@/constants/applicationInsights'
-import ApplicantAnalytics from '@/components/ApplicantAnalytics.vue'
 
 const dataStore = useApplicantDataStore()
 const catalogStore = useApplicantServiceCatalogStore()
@@ -79,7 +76,7 @@ const applicationCounts = computed(() =>
           </template>
         </FccSectionHeader>
         <el-skeleton v-if="!payments.length && dataStore.loading" :rows="3" animated />
-        <el-table v-else :data="payments.slice(0, 5)" size="small" empty-text="No payment records">
+        <el-table v-else :data="payments.slice(0, 5)" empty-text="No payment records">
           <el-table-column prop="applicationId" label="Application" min-width="150" />
           <el-table-column prop="amount" label="Amount" min-width="120">
             <template #default="scope">{{ Number(scope.row.amount || 0).toLocaleString() }}</template>
@@ -99,7 +96,7 @@ const applicationCounts = computed(() =>
           </template>
         </FccSectionHeader>
         <el-skeleton v-if="!certificates.length && dataStore.loading" :rows="3" animated />
-        <el-table v-else :data="certificates.slice(0, 5)" size="small" empty-text="No certificates yet">
+        <el-table v-else :data="certificates.slice(0, 5)" empty-text="No certificates yet">
           <el-table-column prop="certificateId" label="Certificate ID" min-width="160" />
           <el-table-column prop="service" label="Service" min-width="160" />
           <el-table-column prop="issuedAt" label="Issued" min-width="120" />
@@ -142,28 +139,6 @@ const applicationCounts = computed(() =>
         <el-table-column prop="submittedAt" label="Submitted" min-width="120" />
       </el-table>
     </div>
-
-    <article class="mt-6 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-      <FccSectionHeader title="Application Insights" />
-      <ApplicationsInsightsPanel
-        :summary="OVERVIEW_INSIGHTS.summary"
-        :stats="OVERVIEW_INSIGHTS.stats"
-        :trend="OVERVIEW_INSIGHTS.trend"
-        :volume-series="OVERVIEW_INSIGHTS.volumeSeries"
-        :status-breakdown="OVERVIEW_INSIGHTS.statusBreakdown"
-        :progress-milestones="OVERVIEW_INSIGHTS.progressMilestones"
-        :health-score="OVERVIEW_INSIGHTS.healthScore"
-      />
-    </article>
-
-    <article class="mt-6 rounded-2xl border border-slate-200 p-4 dark:border-slate-700">
-      <FccSectionHeader title="My Analytics" />
-      <ApplicantAnalytics
-        :applications="dataStore.applications"
-        :payments="dataStore.payments"
-        :certificates="dataStore.certificates"
-      />
-    </article>
 
     <OnboardingOverlay />
   </section>

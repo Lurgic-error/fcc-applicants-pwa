@@ -26,7 +26,7 @@ function copyUrl() {
     <div class="flex flex-wrap gap-5">
       <div class="flex flex-col items-center gap-2">
         <img :src="qrImage" alt="Verification QR Code" class="h-32 w-32 rounded-xl border border-slate-200 bg-white p-2 dark:border-slate-600" />
-        <el-button link type="primary" size="small" @click="copyUrl">
+        <el-button link type="primary" @click="copyUrl">
           <i class="fa-solid fa-copy mr-1" />Copy verification link
         </el-button>
       </div>

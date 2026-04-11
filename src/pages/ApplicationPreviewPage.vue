@@ -252,7 +252,7 @@ onMounted(async () => {
               </div>
               <el-button
                 v-if="isEditingMode"
-                size="small"
+               
                 plain
                 @click="editSection(section.stepIndex)"
               >

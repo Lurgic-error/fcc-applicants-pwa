@@ -15,10 +15,13 @@ import {
 import { useApplicantDataStore } from '@/stores/applications'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoSave } from '@/composables/useAutoSave'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import ApplicantInfoStep from '@/components/wizards/ApplicantInfoStep.vue'
 import ApplicationFeeSummary from '@/components/wizards/ApplicationFeeSummary.vue'
 import SFCCContractDialog from '@/components/wizards/SFCCContractDialog.vue'
 import GePGPaymentPanel from '@/components/forms/GePGPaymentPanel.vue'
+import WizardShell from './WizardShell.vue'
+import WizardSidebar from './WizardSidebar.vue'
 import {
   generateTrademarkControlNumber,
   verifyTrademarkPaymentByControlNumber
@@ -62,13 +65,16 @@ const isEditMode = computed(() => props.mode === 'update')
 const pageTitle = computed(() => `${isEditMode.value ? 'Update' : 'New'} ${service.value.label}`)
 
 const wizardSteps = [
-  { title: 'Applicant' },
-  { title: 'Business Information' },
-  { title: 'Contracts' },
-  { title: 'Fee Summary' },
-  { title: 'Payment' },
-  { title: 'Review & Submit' }
+  { key: 'applicant', title: 'Applicant' },
+  { key: 'business', title: 'Business Information' },
+  { key: 'contracts', title: 'Contracts' },
+  { key: 'fees', title: 'Fee Summary' },
+  { key: 'payment', title: 'Payment' },
+  { key: 'review', title: 'Review & Submit' }
 ]
+
+const sidebarSteps = computed(() => wizardSteps.map(s => ({ key: s.key, label: s.title })))
+const currentStepKey = computed(() => wizardSteps[stepIndex.value]?.key || '')
 
 const form = reactive({
   applicant: {
@@ -118,10 +124,10 @@ const payerName = computed(() => {
   return [form.applicant.firstName, form.applicant.surname].filter(Boolean).join(' ')
 })
 
-const { lastSaved, showResumePrompt, saveDraft, resumeDraft, discardDraft, clearDraft, checkForExistingDraft } = useAutoSave(
+const { lastSavedAt: lastSaved, hasDraft: showResumePrompt, save: saveDraft, restore: resumeDraft, clearDraft } = useAutoSave(
   `fcc_wizard_draft_${props.serviceKey}`,
-  () => ({ ...form }),
-  (data) => Object.assign(form, data)
+  { value: form },
+  { onRestore: (data) => Object.assign(form, data) }
 )
 
 const formSnapshot = ref('')
@@ -522,50 +528,46 @@ onMounted(async () => {
   captureSnapshot()
 
   if (!isEditMode.value) {
-    checkForExistingDraft()
+    resumeDraft()
   }
 })
 </script>
 
 <template>
-  <section>
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 class="text-2xl font-semibold">{{ pageTitle }}</h2>
-        <p class="mt-1 text-sm text-slate-600">
-          Complete the wizard to {{ isEditMode ? 'update' : 'submit' }} your {{ service.label.toLowerCase() }} request.
-        </p>
-      </div>
-      <router-link :to="overviewRoute">
-        <el-button>Back to {{ service.label }}</el-button>
-      </router-link>
-    </div>
-
-    <MobileStepNavigator
-      v-if="false"
-      :steps="wizardSteps"
-      :current-step="stepIndex"
-      @update:current-step="stepIndex = $event"
-    />
-
-    <el-steps :active="stepIndex" class="mt-6 hidden lg:flex">
-      <el-step v-for="step in wizardSteps" :key="step.title" :title="step.title" />
-    </el-steps>
-
-    <!-- Mobile step indicator -->
-    <div class="mt-4 flex items-center gap-2 text-sm text-slate-500 lg:hidden">
-      <span class="font-semibold text-slate-800">Step {{ stepIndex + 1 }}</span> of {{ wizardSteps.length }}: {{ wizardSteps[stepIndex]?.title }}
-    </div>
+  <WizardShell
+    :title="service.label"
+    :subtitle="isEditMode ? 'Edit Application' : 'New Application'"
+    :step-title="wizardSteps[stepIndex]?.title || ''"
+    :current-step-index="stepIndex"
+    :total-steps="wizardSteps.length"
+    :is-first-step="stepIndex === 0"
+    :is-last-step="stepIndex >= wizardSteps.length - 1"
+    :submitting="submitting"
+    :last-saved="lastSaved"
+    :back-route="overviewRoute"
+    :submit-label="isEditMode ? 'Save Updates' : 'Submit Application'"
+    @previous="previousStep"
+    @next="nextStep"
+    @submit="submit"
+    @save-draft="saveDraft"
+  >
+    <template #sidebar>
+      <WizardSidebar
+        :steps="sidebarSteps"
+        :current-step-key="currentStepKey"
+        @step-click="(key) => { stepIndex = wizardSteps.findIndex(s => s.key === key) }"
+      />
+    </template>
 
     <h2 ref="stepHeadingRef" tabindex="-1" class="sr-only outline-none">
       Step {{ stepIndex + 1 }} of {{ wizardSteps.length }}: {{ wizardSteps[stepIndex]?.title }}
     </h2>
 
-    <div v-if="showResumePrompt" class="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-      <p class="text-sm font-medium text-blue-800">You have an unsaved draft from a previous session. Resume?</p>
+    <div v-if="showResumePrompt" class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+      <p class="text-sm font-medium text-blue-800 dark:text-blue-200">You have an unsaved draft from a previous session. Resume?</p>
       <div class="mt-3 flex gap-2">
-        <el-button type="primary" size="small" @click="resumeDraft">Resume Draft</el-button>
-        <el-button size="small" @click="discardDraft">Start Fresh</el-button>
+        <el-button type="primary" @click="resumeDraft">Resume Draft</el-button>
+        <el-button @click="clearDraft">Start Fresh</el-button>
       </div>
     </div>
 
@@ -584,7 +586,7 @@ onMounted(async () => {
 
       <!-- Step 1: Business Information -->
       <template v-if="stepIndex === 1">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <SmartFormGrid :max-cols="2">
           <el-form-item label="Company Name" prop="business.companyName">
             <el-input v-model="form.business.companyName" placeholder="Registered company name" />
           </el-form-item>
@@ -601,11 +603,11 @@ onMounted(async () => {
             <el-input v-model="form.business.contactPerson" placeholder="Contact person name and role" />
           </el-form-item>
 
-          <el-form-item label="Business Address" prop="business.address" class="md:col-span-2">
+          <el-form-item label="Business Address" prop="business.address" class="col-span-full">
             <el-input v-model="form.business.address" placeholder="Full business address" />
           </el-form-item>
 
-          <el-form-item label="Business Description" prop="business.businessDescription" class="md:col-span-2">
+          <el-form-item label="Business Description" prop="business.businessDescription">
             <el-input
               v-model="form.business.businessDescription"
               type="textarea"
@@ -613,7 +615,7 @@ onMounted(async () => {
               placeholder="Describe the nature of your business"
             />
           </el-form-item>
-        </div>
+        </SmartFormGrid>
       </template>
 
       <!-- Step 2: Contracts -->
@@ -630,7 +632,7 @@ onMounted(async () => {
           <div
             v-for="(contract, index) in form.contracts"
             :key="contract.contractId || index"
-            class="flex items-start justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4"
+            class="flex items-start justify-between gap-4 rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800"
           >
             <div class="flex-1 min-w-0">
               <p class="font-semibold text-slate-900">{{ contract.title || 'Untitled Contract' }}</p>
@@ -639,13 +641,13 @@ onMounted(async () => {
               <p class="mt-1 text-sm font-medium text-slate-700">95,000 TZS</p>
             </div>
             <div class="flex gap-2 flex-shrink-0">
-              <el-button size="small" type="primary" plain @click="openEditContract(index)">Edit</el-button>
-              <el-button size="small" type="danger" plain @click="removeContract(index)">Remove</el-button>
+              <el-button type="primary" plain @click="openEditContract(index)">Edit</el-button>
+              <el-button type="danger" plain @click="removeContract(index)">Remove</el-button>
             </div>
           </div>
 
           <!-- Total row -->
-          <div v-if="form.contracts.length" class="flex justify-between border-t border-slate-200 pt-3 text-sm font-semibold">
+          <div v-if="form.contracts.length" class="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-3 text-sm font-semibold">
             <span>Total Fee</span>
             <span>{{ totalFee.toLocaleString() }} TZS</span>
           </div>
@@ -678,9 +680,9 @@ onMounted(async () => {
       <!-- Step 5: Review & Submit -->
       <template v-if="stepIndex === 5">
         <div class="space-y-6">
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
             <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Applicant</h3>
-            <div class="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
+            <SmartFormGrid :max-cols="2" gap="sm" class="text-sm">
               <template v-if="form.applicant.type === 'individual'">
                 <div><span class="text-slate-500">Name:</span> {{ form.applicant.firstName }} {{ form.applicant.surname }}</div>
                 <div><span class="text-slate-500">Email:</span> {{ form.applicant.email }}</div>
@@ -691,26 +693,26 @@ onMounted(async () => {
                 <div><span class="text-slate-500">Reg No:</span> {{ form.applicant.registrationNumber }}</div>
                 <div><span class="text-slate-500">Email:</span> {{ form.applicant.email }}</div>
               </template>
-            </div>
+            </SmartFormGrid>
           </div>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
             <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Business</h3>
-            <div class="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
+            <SmartFormGrid :max-cols="2" gap="sm" class="text-sm">
               <div><span class="text-slate-500">Company:</span> {{ form.business.companyName }}</div>
               <div><span class="text-slate-500">Reg No:</span> {{ form.business.registrationNumber }}</div>
               <div><span class="text-slate-500">TIN:</span> {{ form.business.tin || '—' }}</div>
               <div><span class="text-slate-500">Contracts:</span> {{ form.contracts.length }}</div>
-            </div>
+            </SmartFormGrid>
           </div>
 
           <ApplicationFeeSummary :items="feeItems" currency="TZS" />
 
-          <div class="rounded-xl border border-slate-200 bg-white p-4">
-            <el-checkbox v-model="form.declaration.accepted">
+          <div class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+            <el-checkbox v-model="form.declaration.accepted" class="wizard-declaration-checkbox">
               I declare that the information provided is accurate and complete to the best of my knowledge.
             </el-checkbox>
-            <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <SmartFormGrid :max-cols="3" gap="sm" class="mt-3">
               <el-form-item label="Full Name" prop="declaration.name">
                 <el-input v-model="form.declaration.name" placeholder="Signatory full name" />
               </el-form-item>
@@ -720,33 +722,16 @@ onMounted(async () => {
               <el-form-item label="Date" prop="declaration.date">
                 <el-date-picker v-model="form.declaration.date" type="date" value-format="YYYY-MM-DD" />
               </el-form-item>
-            </div>
+            </SmartFormGrid>
           </div>
         </div>
       </template>
     </el-form>
-
-    <div class="mt-4 flex items-center gap-2">
-      <el-button v-if="stepIndex > 0" @click="previousStep">Previous</el-button>
-      <el-button v-if="stepIndex < wizardSteps.length - 1" type="primary" @click="nextStep">Next</el-button>
-      <el-button
-        v-else
-        type="primary"
-        :loading="submitting"
-        :disabled="!form.declaration.accepted"
-        @click="submit"
-      >
-        {{ isEditMode ? 'Save Updates' : 'Submit Application' }}
-      </el-button>
-      <span v-if="lastSaved" class="text-xs text-slate-400">
-        Draft saved {{ new Date(lastSaved).toLocaleTimeString() }}
-      </span>
-    </div>
 
     <SFCCContractDialog
       v-model:visible="contractDialogVisible"
       :contract="editingContract"
       @save="handleContractSave"
     />
-  </section>
+  </WizardShell>
 </template>

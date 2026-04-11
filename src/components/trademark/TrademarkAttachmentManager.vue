@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { TRADEMARK_DOCUMENT_OPTIONS } from '@/constants/trademarkRecordation'
 import FileDropZone from '@/components/FileDropZone.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 
 const props = defineProps({
   modelValue: {
@@ -110,75 +111,77 @@ function updateRow(index, field, value) {
 
     <div class="flex items-center justify-between">
       <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-600">Attached Documents</h3>
-      <el-button size="small" type="primary" plain @click="addRow">Add Document Row</el-button>
+      <el-button type="primary" plain @click="addRow">Add Document Row</el-button>
     </div>
 
     <div
       v-for="(row, index) in rows"
       :key="row.attachmentId || index"
-      class="grid grid-cols-1 gap-3 rounded-2xl border border-slate-200 bg-white p-4 md:grid-cols-2"
+      class="rounded-2xl border border-slate-200 bg-white p-4"
     >
-      <el-form-item class="mb-0" :label="`Document Type #${index + 1}`">
-        <el-select
-          :model-value="row.documentType"
-          filterable
-          placeholder="Select document type"
-          @update:model-value="updateRow(index, 'documentType', $event)"
-        >
-          <el-option
-            v-for="option in TRADEMARK_DOCUMENT_OPTIONS"
-            :key="option.key"
-            :label="option.label"
-            :value="option.key"
+      <SmartFormGrid :max-cols="3">
+        <el-form-item class="mb-0" :label="`Document Type #${index + 1}`">
+          <el-select
+            :model-value="row.documentType"
+            filterable
+            placeholder="Select document type"
+            @update:model-value="updateRow(index, 'documentType', $event)"
+          >
+            <el-option
+              v-for="option in TRADEMARK_DOCUMENT_OPTIONS"
+              :key="option.key"
+              :label="option.label"
+              :value="option.key"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item class="mb-0" label="File Name / Reference">
+          <el-input
+            :model-value="row.fileName"
+            placeholder="e.g. registration-certificate.pdf"
+            @update:model-value="updateRow(index, 'fileName', $event)"
           />
-        </el-select>
-      </el-form-item>
+        </el-form-item>
 
-      <el-form-item class="mb-0" label="File Name / Reference">
-        <el-input
-          :model-value="row.fileName"
-          placeholder="e.g. registration-certificate.pdf"
-          @update:model-value="updateRow(index, 'fileName', $event)"
-        />
-      </el-form-item>
+        <el-form-item class="mb-0" label="Document Reference No.">
+          <el-input
+            :model-value="row.referenceNumber"
+            placeholder="Optional reference"
+            @update:model-value="updateRow(index, 'referenceNumber', $event)"
+          />
+        </el-form-item>
 
-      <el-form-item class="mb-0" label="Document Reference No.">
-        <el-input
-          :model-value="row.referenceNumber"
-          placeholder="Optional reference"
-          @update:model-value="updateRow(index, 'referenceNumber', $event)"
-        />
-      </el-form-item>
+        <el-form-item class="mb-0" label="Issued By">
+          <el-input
+            :model-value="row.issuedBy"
+            placeholder="Authority / issuer"
+            @update:model-value="updateRow(index, 'issuedBy', $event)"
+          />
+        </el-form-item>
 
-      <el-form-item class="mb-0" label="Issued By">
-        <el-input
-          :model-value="row.issuedBy"
-          placeholder="Authority / issuer"
-          @update:model-value="updateRow(index, 'issuedBy', $event)"
-        />
-      </el-form-item>
+        <el-form-item class="mb-0" label="Issued Date">
+          <el-date-picker
+            :model-value="row.issuedDate"
+            type="date"
+            value-format="YYYY-MM-DD"
+            @update:model-value="updateRow(index, 'issuedDate', $event)"
+          />
+        </el-form-item>
 
-      <el-form-item class="mb-0" label="Issued Date">
-        <el-date-picker
-          :model-value="row.issuedDate"
-          type="date"
-          value-format="YYYY-MM-DD"
-          @update:model-value="updateRow(index, 'issuedDate', $event)"
-        />
-      </el-form-item>
+        <el-form-item class="mb-0 col-span-full" label="Notes" full-width>
+          <el-input
+            :model-value="row.notes"
+            type="textarea"
+            :rows="2"
+            @update:model-value="updateRow(index, 'notes', $event)"
+          />
+        </el-form-item>
 
-      <el-form-item class="mb-0" label="Notes">
-        <el-input
-          :model-value="row.notes"
-          type="textarea"
-          :rows="2"
-          @update:model-value="updateRow(index, 'notes', $event)"
-        />
-      </el-form-item>
-
-      <div class="md:col-span-2">
-        <el-button size="small" type="danger" plain @click="removeRow(index)">Remove Row</el-button>
-      </div>
+        <div class="col-span-full" full-width>
+          <el-button type="danger" plain @click="removeRow(index)">Remove Row</el-button>
+        </div>
+      </SmartFormGrid>
     </div>
 
     <p

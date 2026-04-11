@@ -1,5 +1,6 @@
 <script setup>
 import { computed } from 'vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import SchemaField from './SchemaField.vue'
 
 const props = defineProps({
@@ -52,7 +53,7 @@ function formatFee(amount) {
         <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">{{ group.label }}</h4>
         <p v-if="group.description" class="text-xs text-slate-500 dark:text-slate-400">{{ group.description }}</p>
       </div>
-      <el-button size="small" plain :disabled="disabled || !canAdd" @click="addItem">
+      <el-button plain :disabled="disabled || !canAdd" @click="addItem">
         <i class="fa-solid fa-plus mr-1" />Add {{ group.itemLabel || 'Item' }}
       </el-button>
     </div>
@@ -71,7 +72,7 @@ function formatFee(amount) {
             Fee: {{ formatFee(group.feePerItem) }}
           </span>
           <el-button
-            size="small"
+           
             text
             type="danger"
             :disabled="disabled || !canRemove"
@@ -82,7 +83,7 @@ function formatFee(amount) {
         </div>
       </div>
 
-      <div class="grid gap-4 md:grid-cols-2">
+      <SmartFormGrid :max-cols="group.maxCols || 3">
         <SchemaField
           v-for="field in (group.fields || [])"
           :key="field.key"
@@ -91,7 +92,7 @@ function formatFee(amount) {
           :disabled="disabled"
           @update:model-value="updateItemField(index, field.key, $event)"
         />
-      </div>
+      </SmartFormGrid>
     </div>
 
     <div v-if="!items.length" class="rounded-2xl border border-dashed border-slate-300 p-6 text-center dark:border-slate-600">

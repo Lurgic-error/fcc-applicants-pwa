@@ -9,10 +9,7 @@ const form = inject('wizardForm')
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Select Request Type</h3>
-      <p class="wizard-step__description">
         Choose the type of trademark recordation request you wish to submit.
-      </p>
     </div>
 
     <TrademarkRequestTypeSelector

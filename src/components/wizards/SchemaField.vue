@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from 'vue'
+import { UploadFilled } from '@element-plus/icons-vue'
 import { getFieldHelp } from '@/constants/fieldHelpText'
+import { formatNumber, parseNumber } from '@/utils/numberFormat'
 
 const props = defineProps({
   field: { type: Object, required: true },
@@ -17,11 +19,17 @@ const value = computed({
 
 const helpText = computed(() => props.field.helpText || getFieldHelp(props.field.key) || null)
 const isRequired = computed(() => props.field.required)
-const spanClass = computed(() => {
-  if (props.field.span === 'half') return ''
-  if (props.field.span === 'third') return ''
-  return 'md:col-span-2'
-})
+const isFullWidth = computed(() =>
+  props.field.fullWidth ||
+  props.field.span === 'full' ||
+  props.field.type === 'textarea' ||
+  props.field.type === 'file'
+)
+const spanClass = computed(() => (isFullWidth.value ? 'col-span-full' : ''))
+
+function handleFileChange(_, uploadFiles) {
+  value.value = uploadFiles.map((file) => file.raw || file).filter(Boolean)
+}
 </script>
 
 <template>
@@ -53,27 +61,24 @@ const spanClass = computed(() => {
     />
 
     <!-- Number -->
-    <el-input-number
+    <el-input
       v-else-if="field.type === 'number'"
-      v-model="value"
-      :placeholder="field.placeholder"
+      :model-value="formatNumber(value)"
+      @update:model-value="v => { value = parseNumber(v) }"
+      :placeholder="field.placeholder || '0'"
       :disabled="disabled"
-      :controls="false"
-      class="w-full"
     />
 
     <!-- Currency -->
-    <el-input-number
+    <el-input
       v-else-if="field.type === 'currency'"
-      v-model="value"
+      :model-value="formatNumber(value)"
+      @update:model-value="v => { value = parseNumber(v) }"
       :placeholder="field.placeholder || '0'"
       :disabled="disabled"
-      :controls="false"
-      :precision="2"
-      class="w-full"
     >
       <template #prefix>TZS</template>
-    </el-input-number>
+    </el-input>
 
     <!-- Select -->
     <el-select
@@ -112,12 +117,20 @@ const spanClass = computed(() => {
     <!-- File -->
     <el-upload
       v-else-if="field.type === 'file'"
+      class="wizard-upload"
       :auto-upload="false"
       :disabled="disabled"
+      :multiple="field.multiple !== false"
+      :accept="field.accept || undefined"
+      :show-file-list="false"
+      drag
+      @change="handleFileChange"
     >
-      <el-button plain :disabled="disabled">
-        <i class="fa-solid fa-upload mr-2" />Upload
-      </el-button>
+      <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+      <div class="el-upload__text">Drop files here or <em>click to upload</em></div>
+      <template #tip>
+        <div class="el-upload__tip">Upload supporting documents</div>
+      </template>
     </el-upload>
 
     <!-- Fallback -->

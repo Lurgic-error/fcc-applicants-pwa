@@ -27,6 +27,18 @@ function guardApplicationCreateService(to) {
   if (serviceKey === 'trademark-recordation') {
     return { name: 'trademark-create', query: to.query }
   }
+  if (serviceKey === 'merger-clearance') {
+    return { name: 'merger-fcc8-create', query: to.query }
+  }
+  if (serviceKey === 'sfcc-registration') {
+    return { name: 'sfcc-create', query: to.query }
+  }
+  if (serviceKey === 'legal-opinion') {
+    return { name: 'legal-opinion-create', query: to.query }
+  }
+  if (serviceKey === 'exemption') {
+    return { name: 'exemption-create', query: to.query }
+  }
   return guardApplicationService(to)
 }
 
@@ -68,6 +80,11 @@ const router = createRouter({
           component: () => import('@/pages/ResetPasswordPage.vue')
         }
       ]
+    },
+    {
+      path: '/design-system',
+      name: 'design-system',
+      component: () => import('@/pages/DesignSystemPage.vue')
     },
     {
       path: '/portal',
@@ -143,6 +160,45 @@ const router = createRouter({
           name: 'merger-fcc8-update',
           component: () => import('@/pages/Mergers/MergerNotificationWizardPage.vue'),
           props: (route) => ({ mode: 'update', applicationId: String(route.params.id) })
+        },
+        {
+          path: 'sfcc/new',
+          name: 'sfcc-create',
+          component: () => import('@/pages/ApplicationWizardPage.vue'),
+          props: { serviceKey: 'sfcc-registration', mode: 'create' },
+          meta: { title: 'SFCC Registration' }
+        },
+        {
+          path: 'sfcc/:id/edit',
+          name: 'sfcc-update',
+          component: () => import('@/pages/ApplicationWizardPage.vue'),
+          props: (route) => ({ serviceKey: 'sfcc-registration', mode: 'update', applicationId: String(route.params.id) })
+        },
+        {
+          path: 'legal-opinion/new',
+          name: 'legal-opinion-create',
+          component: () => import('@/pages/ApplicationWizardPage.vue'),
+          props: { serviceKey: 'legal-opinion', mode: 'create' },
+          meta: { title: 'Legal Opinion Request' }
+        },
+        {
+          path: 'legal-opinion/:id/edit',
+          name: 'legal-opinion-update',
+          component: () => import('@/pages/ApplicationWizardPage.vue'),
+          props: (route) => ({ serviceKey: 'legal-opinion', mode: 'update', applicationId: String(route.params.id) })
+        },
+        {
+          path: 'exemption/new',
+          name: 'exemption-create',
+          component: () => import('@/pages/ApplicationWizardPage.vue'),
+          props: { serviceKey: 'exemption', mode: 'create' },
+          meta: { title: 'Exemption Application' }
+        },
+        {
+          path: 'exemption/:id/edit',
+          name: 'exemption-update',
+          component: () => import('@/pages/ApplicationWizardPage.vue'),
+          props: (route) => ({ serviceKey: 'exemption', mode: 'update', applicationId: String(route.params.id) })
         },
         {
           path: 'services/:serviceKey/prepare',
@@ -314,6 +370,12 @@ router.beforeEach((to) => {
   }
 
   return true
+})
+
+router.afterEach((to) => {
+  const breadcrumb = to.meta?.breadcrumb || ''
+  const title = to.meta?.title || breadcrumb
+  document.title = title ? `${title} — FCC Applicants Portal` : 'FCC Applicants Portal'
 })
 
 export default router

@@ -291,6 +291,7 @@ export const STEPS = [
   { id: 'counterfactual', label: 'Counterfactual', fcc: 'S.20', desc: 'State of market without acquisition.' },
   { id: 'international', label: 'International', fcc: 'S.21', desc: 'International dimensions and notifications.' },
   { id: 'attachments', label: 'Attachments', fcc: 'S.22', desc: 'Required supporting documents.' },
+  { id: 'mergerFees', label: 'Merger Fees', fcc: 'R.68', desc: 'Provisional declaration of merger filing fees — Rule 68(2).' },
   { id: 'undertaking', label: 'Undertaking & Decl.', fcc: 'S.23-26', desc: 'Undertaking, contacts, and declaration.' },
   { id: 'review', label: 'Review & Submit', fcc: '—', desc: 'Verify and submit your application.' }
 ]
@@ -382,3 +383,18 @@ export const SEVERITY_OPTIONS = [
   { value: 'medium', label: 'Medium' },
   { value: 'low', label: 'Low' }
 ]
+
+// ════════════════════════════════════════════════════════════════════
+// MERGER FEE TIERS — Rule 68(2) of Competition Rules 2018
+// ════════════════════════════════════════════════════════════════════
+
+export const MERGER_FEE_TIERS = [
+  { min: 3_500_000_000, max: 25_000_000_000, fee: 25_000_000, rule: '68(2)(a)', label: 'TZS 3.5B – 25B' },
+  { min: 25_000_000_001, max: 99_999_999_999, fee: 50_000_000, rule: '68(2)(b)', label: '>TZS 25B – <100B' },
+  { min: 100_000_000_000, max: Infinity, fee: 100_000_000, rule: '68(2)(c)', label: 'TZS 100B+' },
+]
+
+export function calculateMergerFee(value) {
+  const tier = MERGER_FEE_TIERS.find(t => value >= t.min && value <= t.max)
+  return tier ? { fee: tier.fee, rule: tier.rule, label: tier.label } : null
+}

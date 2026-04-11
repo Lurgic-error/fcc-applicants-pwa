@@ -54,7 +54,7 @@ function handleProofUpload(uploadFile) {
         Awaiting control number issuance
       </p>
       <div v-if="controlNumber" class="mt-3 flex justify-center gap-2">
-        <el-button size="small" plain @click="navigator.clipboard?.writeText(controlNumber)">
+        <el-button plain @click="navigator.clipboard?.writeText(controlNumber)">
           <i class="fa-solid fa-copy mr-1" />Copy
         </el-button>
       </div>

@@ -81,7 +81,7 @@ async function submit() {
 
       <div class="login-hero__content">
         <img src="@/assets/imgs/logo-2-removebg-preview.png" alt="FCC" class="login-hero__seal" />
-        <h2 class="login-hero__brand">Fair Competition<br />Commission</h2>
+        <h2 class="login-hero__brand">Fair Competition Commission</h2>
         <p class="login-hero__country">United Republic of Tanzania</p>
 
         <div class="login-hero__slide-text">
@@ -160,7 +160,7 @@ async function submit() {
             </router-link>
           </div>
 
-          <el-button class="w-full !h-12 !text-[15px] !font-bold !tracking-wide !rounded-xl" type="primary" size="large" :loading="authStore.loading" data-test="login-submit" @click="submit">
+          <el-button class="w-full !h-12 !text-[15px] !font-bold !tracking-wide" type="primary" size="large" :loading="authStore.loading" data-test="login-submit" @click="submit">
             Sign In
           </el-button>
         </el-form>
@@ -404,7 +404,7 @@ async function submit() {
   gap: 0.5rem;
   width: 100%;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--fcc-radius-base);
   border: 1.5px solid #e2e8f0;
   font-size: 0.85rem;
   font-weight: 600;

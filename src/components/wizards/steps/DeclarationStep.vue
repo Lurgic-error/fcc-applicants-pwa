@@ -1,4 +1,6 @@
 <script setup>
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
+
 const props = defineProps({
   formData: { type: Object, default: () => ({}) },
   disabled: { type: Boolean, default: false },
@@ -28,12 +30,13 @@ function update(key, value) {
         :model-value="formData.declarationAccepted || false"
         @update:model-value="update('declarationAccepted', $event)"
         :disabled="disabled"
+        class="wizard-declaration-checkbox"
       >
         I accept this declaration
       </el-checkbox>
     </el-form-item>
 
-    <div class="grid gap-4 md:grid-cols-2">
+    <SmartFormGrid :max-cols="2">
       <el-form-item label="Full Name">
         <el-input
           :model-value="formData.declarationName || ''"
@@ -50,6 +53,6 @@ function update(key, value) {
           placeholder="e.g. Director, Manager"
         />
       </el-form-item>
-    </div>
+    </SmartFormGrid>
   </div>
 </template>

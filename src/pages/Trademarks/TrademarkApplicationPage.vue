@@ -19,6 +19,7 @@ import TrademarkAttachmentManager from '@/components/trademark/TrademarkAttachme
 import TrademarkPaymentPanel from '@/components/trademark/TrademarkPaymentPanel.vue'
 import TrademarkRequestTypeSelector from '@/components/trademark/TrademarkRequestTypeSelector.vue'
 import TrademarkSubmissionsList from '@/components/trademark/TrademarkSubmissionsList.vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 import { useApplicantDataStore } from '@/stores/applications'
 import { useAuthStore } from '@/stores/auth'
 
@@ -1335,10 +1336,10 @@ watch(
               <div class="flex items-center justify-between">
                 <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-600">Trademarks</h3>
                 <div class="flex gap-1">
-                  <el-button size="small" plain @click="showTrademarkList = !showTrademarkList">
+                  <el-button plain @click="showTrademarkList = !showTrademarkList">
                     {{ showTrademarkList ? 'Back to Edit' : 'View All' }}
                   </el-button>
-                  <el-button size="small" type="primary" plain @click="addTrademarkRow">Add</el-button>
+                  <el-button type="primary" plain @click="addTrademarkRow">Add</el-button>
                 </div>
               </div>
 
@@ -1371,7 +1372,7 @@ watch(
                   </button>
                 </div>
                 <el-button
-                  size="small"
+                 
                   type="danger"
                   plain
                   class="w-full"
@@ -1418,7 +1419,7 @@ watch(
                   </el-select>
                 </el-form-item>
                 <el-form-item label="Country of Origin" class="mb-0">
-                  <el-input v-model="activeTrademark.countryOfOrigin" />
+                  <CountrySelect v-model="activeTrademark.countryOfOrigin" placeholder="Select country of origin" />
                 </el-form-item>
                 <el-form-item label="Registration Reference" class="mb-0 md:col-span-2">
                   <el-input v-model="activeTrademark.registrationReference" />
@@ -1457,7 +1458,7 @@ watch(
                   <el-input v-model="activeTrademark.owner.businessAddress" />
                 </el-form-item>
                 <el-form-item label="Owner Nationality / Jurisdiction" class="mb-0">
-                  <el-input v-model="activeTrademark.owner.nationalityOrJurisdiction" />
+                  <CountrySelect v-model="activeTrademark.owner.nationalityOrJurisdiction" placeholder="Select nationality or jurisdiction" />
                 </el-form-item>
 
                 <template v-if="form.trademarkRecordation.applicantRole === 'agent' || form.trademarkRecordation.requestType === 'agent_appointment'">
@@ -1485,7 +1486,7 @@ watch(
               <div v-else-if="currentTrademarkSection.key === 'manufacturers'" class="space-y-3">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium text-slate-700">Manufacturers</p>
-                  <el-button size="small" type="primary" plain @click="addArrayItemToActiveTrademark('manufacturers', createManufacturer)">Add Manufacturer</el-button>
+                  <el-button type="primary" plain @click="addArrayItemToActiveTrademark('manufacturers', createManufacturer)">Add Manufacturer</el-button>
                 </div>
                 <div
                   v-for="(manufacturer, manufacturerIndex) in activeTrademark.manufacturers"
@@ -1496,7 +1497,7 @@ watch(
                     <el-input v-model="manufacturer.name" />
                   </el-form-item>
                   <el-form-item label="Country" class="mb-0">
-                    <el-input v-model="manufacturer.country" />
+                    <CountrySelect v-model="manufacturer.country" placeholder="Select country" />
                   </el-form-item>
                   <el-form-item label="Address" class="mb-0 md:col-span-2">
                     <el-input v-model="manufacturer.address" />
@@ -1511,7 +1512,7 @@ watch(
                     <el-input v-model="manufacturer.notes" type="textarea" :rows="2" />
                   </el-form-item>
                   <div class="md:col-span-2">
-                    <el-button size="small" type="danger" plain @click="removeArrayItemFromActiveTrademark('manufacturers', manufacturerIndex)">Remove</el-button>
+                    <el-button type="danger" plain @click="removeArrayItemFromActiveTrademark('manufacturers', manufacturerIndex)">Remove</el-button>
                   </div>
                 </div>
               </div>
@@ -1519,7 +1520,7 @@ watch(
               <div v-else-if="currentTrademarkSection.key === 'authorizedParties'" class="space-y-3">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium text-slate-700">Licensed / Authorized Parties</p>
-                  <el-button size="small" type="primary" plain @click="addArrayItemToActiveTrademark('authorizedParties', createAuthorizedParty)">Add Party</el-button>
+                  <el-button type="primary" plain @click="addArrayItemToActiveTrademark('authorizedParties', createAuthorizedParty)">Add Party</el-button>
                 </div>
                 <div
                   v-for="(party, partyIndex) in activeTrademark.authorizedParties"
@@ -1536,7 +1537,7 @@ watch(
                     <el-input v-model="party.address" />
                   </el-form-item>
                   <el-form-item label="Country" class="mb-0">
-                    <el-input v-model="party.country" />
+                    <CountrySelect v-model="party.country" placeholder="Select country" />
                   </el-form-item>
                   <el-form-item label="Email" class="mb-0">
                     <el-input v-model="party.email" />
@@ -1548,7 +1549,7 @@ watch(
                     <el-input v-model="party.notes" type="textarea" :rows="2" />
                   </el-form-item>
                   <div class="md:col-span-2">
-                    <el-button size="small" type="danger" plain @click="removeArrayItemFromActiveTrademark('authorizedParties', partyIndex)">Remove</el-button>
+                    <el-button type="danger" plain @click="removeArrayItemFromActiveTrademark('authorizedParties', partyIndex)">Remove</el-button>
                   </div>
                 </div>
               </div>
@@ -1556,7 +1557,7 @@ watch(
               <div v-else-if="currentTrademarkSection.key === 'affiliates'" class="space-y-3">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium text-slate-700">Affiliated Companies</p>
-                  <el-button size="small" type="primary" plain @click="addArrayItemToActiveTrademark('affiliatedCompanies', createAffiliateCompany)">Add Affiliate</el-button>
+                  <el-button type="primary" plain @click="addArrayItemToActiveTrademark('affiliatedCompanies', createAffiliateCompany)">Add Affiliate</el-button>
                 </div>
                 <div
                   v-for="(company, companyIndex) in activeTrademark.affiliatedCompanies"
@@ -1570,13 +1571,13 @@ watch(
                     <el-input v-model="company.relationship" placeholder="e.g. Parent Company" />
                   </el-form-item>
                   <el-form-item label="Country" class="mb-0">
-                    <el-input v-model="company.country" />
+                    <CountrySelect v-model="company.country" placeholder="Select country" />
                   </el-form-item>
                   <el-form-item label="Notes" class="mb-0 md:col-span-2">
                     <el-input v-model="company.notes" type="textarea" :rows="2" />
                   </el-form-item>
                   <div class="md:col-span-2">
-                    <el-button size="small" type="danger" plain @click="removeArrayItemFromActiveTrademark('affiliatedCompanies', companyIndex)">Remove</el-button>
+                    <el-button type="danger" plain @click="removeArrayItemFromActiveTrademark('affiliatedCompanies', companyIndex)">Remove</el-button>
                   </div>
                 </div>
               </div>
@@ -1584,7 +1585,7 @@ watch(
               <div v-else-if="currentTrademarkSection.key === 'visuals'" class="space-y-3">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium text-slate-700">Trademark Visuals</p>
-                  <el-button size="small" type="primary" plain @click="addArrayItemToActiveTrademark('visuals', createTrademarkVisual)">Add Visual</el-button>
+                  <el-button type="primary" plain @click="addArrayItemToActiveTrademark('visuals', createTrademarkVisual)">Add Visual</el-button>
                 </div>
                 <div
                   v-for="(visual, visualIndex) in activeTrademark.visuals"
@@ -1607,7 +1608,7 @@ watch(
                     <el-input v-model="visual.notes" type="textarea" :rows="2" />
                   </el-form-item>
                   <div class="md:col-span-2">
-                    <el-button size="small" type="danger" plain @click="removeArrayItemFromActiveTrademark('visuals', visualIndex)">Remove</el-button>
+                    <el-button type="danger" plain @click="removeArrayItemFromActiveTrademark('visuals', visualIndex)">Remove</el-button>
                   </div>
                 </div>
               </div>
@@ -1615,7 +1616,7 @@ watch(
               <div v-else class="space-y-3">
                 <div class="flex items-center justify-between">
                   <p class="text-sm font-medium text-slate-700">Per-trademark Attachments</p>
-                  <el-button size="small" type="primary" plain @click="addArrayItemToActiveTrademark('attachments', createTrademarkAttachment)">Add Attachment</el-button>
+                  <el-button type="primary" plain @click="addArrayItemToActiveTrademark('attachments', createTrademarkAttachment)">Add Attachment</el-button>
                 </div>
                 <div
                   v-for="(attachment, attachmentIndex) in activeTrademark.attachments"
@@ -1648,7 +1649,7 @@ watch(
                     <el-input v-model="attachment.notes" type="textarea" :rows="2" />
                   </el-form-item>
                   <div class="md:col-span-2">
-                    <el-button size="small" type="danger" plain @click="removeArrayItemFromActiveTrademark('attachments', attachmentIndex)">Remove</el-button>
+                    <el-button type="danger" plain @click="removeArrayItemFromActiveTrademark('attachments', attachmentIndex)">Remove</el-button>
                   </div>
                 </div>
               </div>
@@ -1799,7 +1800,7 @@ watch(
           <el-date-picker v-model="form.trademarkRecordation.declarationDate" type="date" value-format="YYYY-MM-DD" />
         </el-form-item>
         <el-form-item prop="trademarkRecordation.declarationAccepted" class="md:col-span-2">
-          <el-checkbox v-model="form.trademarkRecordation.declarationAccepted">
+          <el-checkbox v-model="form.trademarkRecordation.declarationAccepted" class="wizard-declaration-checkbox">
             I declare that the submitted information and documents are true and complete.
           </el-checkbox>
         </el-form-item>

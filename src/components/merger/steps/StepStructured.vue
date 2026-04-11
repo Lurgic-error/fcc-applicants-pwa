@@ -5,6 +5,7 @@
  * to render the correct fields with minimal boilerplate.
  */
 import { inject } from 'vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 
 const props = defineProps({
   stepId: { type: String, required: true },
@@ -165,7 +166,7 @@ const fields = FIELD_MAP[props.stepId] || []
     <h3 class="merger-subsection-title">{{ stepDef.label || stepId }}</h3>
     <p v-if="stepDef.desc" class="merger-step-desc">{{ stepDef.desc }}</p>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <SmartFormGrid :max-cols="3">
       <template v-for="field in fields" :key="field.path">
         <!-- Textarea -->
         <el-form-item
@@ -208,7 +209,7 @@ const fields = FIELD_MAP[props.stepId] || []
           />
         </el-form-item>
       </template>
-    </div>
+    </SmartFormGrid>
 
     <div v-if="!fields.length" class="merger-empty-state">
       No fields configured for step "{{ stepId }}".

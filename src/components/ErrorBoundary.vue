@@ -41,14 +41,6 @@ function goToDashboard() {
         <el-button type="primary" @click="retry">Try Again</el-button>
         <el-button plain @click="goToDashboard">Go to Dashboard</el-button>
       </div>
-      <details class="mt-6 text-left">
-        <summary class="cursor-pointer text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
-          Error details
-        </summary>
-        <pre class="mt-2 max-h-40 overflow-auto rounded-lg bg-slate-100 p-3 text-xs text-slate-700 dark:bg-slate-800 dark:text-slate-300">{{ errorMessage }}
-
-{{ errorStack }}</pre>
-      </details>
     </div>
   </div>
   <slot v-else />

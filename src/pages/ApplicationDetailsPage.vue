@@ -731,12 +731,12 @@ function formatDate(date) { return date ? new Date(date).toLocaleDateString('en-
               <el-input v-model="actionForm.manager" placeholder="Manager ID / Name" />
               <el-input v-model="actionForm.officer" placeholder="Officer ID / Name" />
               <div class="flex flex-wrap gap-2">
-                <el-button size="small" :loading="actionLoading" @click="runAction('assignDirector', { director: actionForm.director }, 'Director assigned')">Assign Director</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('assignManager', { manager: actionForm.manager }, 'Manager assigned')">Assign Manager</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('assignOfficer', { officer: actionForm.officer }, 'Officer assigned')">Assign Officer</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('reassignDirector', { director: actionForm.director }, 'Director reassigned')">Reassign Director</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('reassignManager', { manager: actionForm.manager }, 'Manager reassigned')">Reassign Manager</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('reassignOfficer', { officer: actionForm.officer }, 'Officer reassigned')">Reassign Officer</el-button>
+                <el-button :loading="actionLoading" @click="runAction('assignDirector', { director: actionForm.director }, 'Director assigned')">Assign Director</el-button>
+                <el-button :loading="actionLoading" @click="runAction('assignManager', { manager: actionForm.manager }, 'Manager assigned')">Assign Manager</el-button>
+                <el-button :loading="actionLoading" @click="runAction('assignOfficer', { officer: actionForm.officer }, 'Officer assigned')">Assign Officer</el-button>
+                <el-button :loading="actionLoading" @click="runAction('reassignDirector', { director: actionForm.director }, 'Director reassigned')">Reassign Director</el-button>
+                <el-button :loading="actionLoading" @click="runAction('reassignManager', { manager: actionForm.manager }, 'Manager reassigned')">Reassign Manager</el-button>
+                <el-button :loading="actionLoading" @click="runAction('reassignOfficer', { officer: actionForm.officer }, 'Officer reassigned')">Reassign Officer</el-button>
               </div>
             </div>
           </article>
@@ -750,9 +750,9 @@ function formatDate(date) { return date ? new Date(date).toLocaleDateString('en-
               <el-input v-model="actionForm.activity" placeholder="Activity ID" />
               <el-input v-model="actionForm.task" placeholder="Task ID" />
               <div class="flex flex-wrap gap-2">
-                <el-button size="small" :loading="actionLoading" @click="runAction('updateStatus', { status: actionForm.status, stage: actionForm.stage, notes: actionForm.notes }, 'Status updated')">Update Status</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('linkActivity', { activity: actionForm.activity, notes: actionForm.notes }, 'Activity linked')">Link Activity</el-button>
-                <el-button size="small" :loading="actionLoading" @click="runAction('linkTask', { task: actionForm.task, notes: actionForm.notes }, 'Task linked')">Link Task</el-button>
+                <el-button :loading="actionLoading" @click="runAction('updateStatus', { status: actionForm.status, stage: actionForm.stage, notes: actionForm.notes }, 'Status updated')">Update Status</el-button>
+                <el-button :loading="actionLoading" @click="runAction('linkActivity', { activity: actionForm.activity, notes: actionForm.notes }, 'Activity linked')">Link Activity</el-button>
+                <el-button :loading="actionLoading" @click="runAction('linkTask', { task: actionForm.task, notes: actionForm.notes }, 'Task linked')">Link Task</el-button>
               </div>
             </div>
           </article>
@@ -762,39 +762,39 @@ function formatDate(date) { return date ? new Date(date).toLocaleDateString('en-
             <div class="mt-2 space-y-2">
               <el-input v-model="actionForm.reviewTitle" placeholder="Review title" />
               <el-input v-model="actionForm.reviewReport" type="textarea" :rows="2" placeholder="Review summary" />
-              <el-button size="small" :loading="actionLoading" @click="runAction('addReview', { review: actionReviewSummary() }, 'Review added')">Add Review</el-button>
+              <el-button :loading="actionLoading" @click="runAction('addReview', { review: actionReviewSummary() }, 'Review added')">Add Review</el-button>
 
               <el-select v-model="actionForm.reviewId" clearable placeholder="Select review">
                 <el-option v-for="review in reviews" :key="review.reviewId" :label="review.reviewId" :value="review.reviewId" />
               </el-select>
               <div class="flex flex-wrap gap-2">
-                <el-button size="small" :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('editReview', { reviewId: actionForm.reviewId, changes: { title: actionForm.reviewTitle, report: actionForm.reviewReport } }, 'Review updated')">Edit Review</el-button>
-                <el-button size="small" :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('submitReview', { reviewId: actionForm.reviewId }, 'Review submitted')">Submit Review</el-button>
-                <el-button size="small" :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('approveReview', { reviewId: actionForm.reviewId }, 'Review approved')">Approve Review</el-button>
-                <el-button size="small" :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('rejectReview', { reviewId: actionForm.reviewId }, 'Review rejected')">Reject Review</el-button>
+                <el-button :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('editReview', { reviewId: actionForm.reviewId, changes: { title: actionForm.reviewTitle, report: actionForm.reviewReport } }, 'Review updated')">Edit Review</el-button>
+                <el-button :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('submitReview', { reviewId: actionForm.reviewId }, 'Review submitted')">Submit Review</el-button>
+                <el-button :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('approveReview', { reviewId: actionForm.reviewId }, 'Review approved')">Approve Review</el-button>
+                <el-button :disabled="!actionForm.reviewId" :loading="actionLoading" @click="runAction('rejectReview', { reviewId: actionForm.reviewId }, 'Review rejected')">Reject Review</el-button>
               </div>
 
               <el-input v-model="actionForm.reportTitle" placeholder="Report title" />
               <el-input v-model="actionForm.reportBody" type="textarea" :rows="2" placeholder="Report summary" />
-              <el-button size="small" :loading="actionLoading" @click="runAction('addReport', { report: actionReportSummary() }, 'Report added')">Add Report</el-button>
+              <el-button :loading="actionLoading" @click="runAction('addReport', { report: actionReportSummary() }, 'Report added')">Add Report</el-button>
 
               <el-select v-model="actionForm.reportId" clearable placeholder="Select report">
                 <el-option v-for="report in reports" :key="report.reportId" :label="report.reportId" :value="report.reportId" />
               </el-select>
               <div class="flex flex-wrap gap-2">
-                <el-button size="small" :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('editReport', { reportId: actionForm.reportId, changes: { title: actionForm.reportTitle, body: actionForm.reportBody } }, 'Report updated')">Edit Report</el-button>
-                <el-button size="small" :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('submitReport', { reportId: actionForm.reportId }, 'Report submitted')">Submit Report</el-button>
-                <el-button size="small" :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('approveReport', { reportId: actionForm.reportId }, 'Report approved')">Approve Report</el-button>
-                <el-button size="small" :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('rejectReport', { reportId: actionForm.reportId }, 'Report rejected')">Reject Report</el-button>
+                <el-button :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('editReport', { reportId: actionForm.reportId, changes: { title: actionForm.reportTitle, body: actionForm.reportBody } }, 'Report updated')">Edit Report</el-button>
+                <el-button :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('submitReport', { reportId: actionForm.reportId }, 'Report submitted')">Submit Report</el-button>
+                <el-button :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('approveReport', { reportId: actionForm.reportId }, 'Report approved')">Approve Report</el-button>
+                <el-button :disabled="!actionForm.reportId" :loading="actionLoading" @click="runAction('rejectReport', { reportId: actionForm.reportId }, 'Report rejected')">Reject Report</el-button>
               </div>
 
               <el-divider />
               <el-input v-model="actionForm.attachmentName" placeholder="Attachment file name" />
               <el-input v-model="actionForm.attachmentId" placeholder="Attachment ID (for edit/remove)" />
               <div class="flex flex-wrap gap-2">
-                <el-button size="small" :loading="actionLoading" @click="runAction('addAttachment', { attachment: { fileName: actionForm.attachmentName || 'attachment' } }, 'Attachment added')">Add Attachment</el-button>
-                <el-button size="small" :disabled="!actionForm.attachmentId" :loading="actionLoading" @click="runAction('editAttachment', { attachmentId: actionForm.attachmentId, changes: { fileName: actionForm.attachmentName || 'attachment' } }, 'Attachment updated')">Edit Attachment</el-button>
-                <el-button size="small" :disabled="!actionForm.attachmentId" :loading="actionLoading" @click="runAction('removeAttachment', { attachmentId: actionForm.attachmentId }, 'Attachment removed')">Remove Attachment</el-button>
+                <el-button :loading="actionLoading" @click="runAction('addAttachment', { attachment: { fileName: actionForm.attachmentName || 'attachment' } }, 'Attachment added')">Add Attachment</el-button>
+                <el-button :disabled="!actionForm.attachmentId" :loading="actionLoading" @click="runAction('editAttachment', { attachmentId: actionForm.attachmentId, changes: { fileName: actionForm.attachmentName || 'attachment' } }, 'Attachment updated')">Edit Attachment</el-button>
+                <el-button :disabled="!actionForm.attachmentId" :loading="actionLoading" @click="runAction('removeAttachment', { attachmentId: actionForm.attachmentId }, 'Attachment removed')">Remove Attachment</el-button>
               </div>
             </div>
           </article>

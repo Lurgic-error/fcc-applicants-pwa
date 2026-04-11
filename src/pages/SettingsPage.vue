@@ -8,6 +8,8 @@ import {
   updateApplicantProfile
 } from '@/services/applicantApi'
 import { useAuthStore } from '@/stores/auth'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { isPushSupported, subscribeToPush, unsubscribeFromPush, isPushEnabled } from '@/services/pushNotifications'
 
 const PREFERENCE_KEY = 'fcc_applicant_preferences'
@@ -277,154 +279,337 @@ onMounted(async () => {
 </script>
 
 <template>
-  <section class="space-y-6">
-    <FccPageHeader title="Settings" subtitle="Manage your profile, security, and personal preferences." borderless />
+  <section class="set" v-loading="loading">
+    <div class="set__head">
+      <h1 class="set__title">Settings</h1>
+      <p class="set__subtitle">Manage your profile, security, and preferences.</p>
+    </div>
 
-    <el-tabs model-value="profile" class="settings-tabs">
-      <!-- ── Profile Tab ────────────────────────────────────────── -->
-      <el-tab-pane label="Profile" name="profile">
-        <div class="space-y-5 pt-2">
-          <div class="rounded-2xl border border-slate-200 p-4">
-            <h3 class="text-lg font-semibold">Profile Picture</h3>
-            <div class="mt-3 flex flex-wrap items-center gap-4">
-              <el-avatar :size="80" :src="avatar">
-                {{ (profile.fullName || 'A').charAt(0).toUpperCase() }}
-              </el-avatar>
-              <el-upload :auto-upload="false" :show-file-list="false" accept="image/*" @change="onAvatarChange">
-                <el-button plain>Upload Picture</el-button>
-              </el-upload>
-            </div>
+    <!-- ── Profile Photo ── -->
+    <div class="set__row">
+      <div class="set__row-left">
+        <h4>Profile Photo</h4>
+        <p>This will be displayed on your account.</p>
+      </div>
+      <div class="set__row-right">
+        <el-upload class="set__photo-area" :auto-upload="false" :show-file-list="false" accept="image/*" @change="onAvatarChange">
+          <el-avatar :size="96" :src="avatar" class="set__avatar">
+            {{ (profile.fullName || profile.companyName || 'A').charAt(0).toUpperCase() }}
+          </el-avatar>
+          <div>
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 20px; color: var(--fcc-primary-500); margin-bottom: 0.25rem" />
+            <p class="set__photo-cta">Click to upload or drag and drop</p>
+            <p class="set__photo-hint">PNG, JPG or SVG (max 2MB)</p>
           </div>
+        </el-upload>
+      </div>
+    </div>
 
-          <div class="rounded-2xl border border-slate-200 p-4" v-loading="loading">
-            <h3 class="text-lg font-semibold">Edit Profile</h3>
-            <el-form ref="profileFormRef" class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" label-position="top" :model="profile" :rules="profileRules">
-              <el-form-item label="Applicant Type" prop="applicantType" class="md:col-span-2">
-                <el-segmented
-                  v-model="profile.applicantType"
-                  :options="[
-                    { label: 'Firm', value: 'firm' },
-                    { label: 'Individual', value: 'individual' }
-                  ]"
-                />
+    <!-- ── Company / Individual Details ── -->
+    <el-form ref="profileFormRef" label-position="top" :model="profile" :rules="profileRules">
+      <div class="set__row">
+        <div class="set__row-left">
+          <h4>{{ isFirmApplicant ? 'Company Details' : 'Personal Details' }}</h4>
+          <p>{{ isFirmApplicant ? 'Legal name and registration as filed with BRELA.' : 'Your personal identification details.' }}</p>
+        </div>
+        <div class="set__row-right">
+          <div class="set__fields set__fields--3">
+            <template v-if="isFirmApplicant">
+              <el-form-item label="Company Name" prop="companyName">
+                <el-input v-model="profile.companyName" placeholder="Legal company name" />
               </el-form-item>
-
-              <template v-if="isFirmApplicant">
-                <el-form-item label="Company Name" prop="companyName">
-                  <el-input v-model="profile.companyName" />
-                </el-form-item>
-                <el-form-item label="Registration Number" prop="registrationNumber">
-                  <el-input v-model="profile.registrationNumber" />
-                </el-form-item>
-                <el-form-item label="Country Of Incorporation" prop="countryOfIncorporation">
-                  <el-input v-model="profile.countryOfIncorporation" />
-                </el-form-item>
-                <el-form-item label="Contact Person Name" prop="contactPersonName">
-                  <el-input v-model="profile.contactPersonName" />
-                </el-form-item>
-                <el-form-item label="Contact Person Email" prop="contactPersonEmail">
-                  <el-input v-model="profile.contactPersonEmail" />
-                </el-form-item>
-                <el-form-item label="Contact Person Phone" prop="contactPersonPhone">
-                  <el-input v-model="profile.contactPersonPhone" />
-                </el-form-item>
-              </template>
-
-              <template v-else>
-                <el-form-item label="First Name" prop="firstName">
-                  <el-input v-model="profile.firstName" />
-                </el-form-item>
-                <el-form-item label="Surname" prop="surname">
-                  <el-input v-model="profile.surname" />
-                </el-form-item>
-                <el-form-item label="National ID / Passport" prop="nationalId">
-                  <el-input v-model="profile.nationalId" />
-                </el-form-item>
-                <el-form-item label="Country Of Residence" prop="countryOfResidence">
-                  <el-input v-model="profile.countryOfResidence" />
-                </el-form-item>
-              </template>
-
-              <el-form-item label="Email" prop="email">
-                <el-input v-model="profile.email" />
+              <el-form-item label="Registration Number" prop="registrationNumber">
+                <el-input v-model="profile.registrationNumber" placeholder="BRELA / TIN" />
               </el-form-item>
-              <el-form-item label="Phone Number" prop="phoneNumber">
-                <el-input v-model="profile.phoneNumber" />
+              <el-form-item label="Country of Incorporation" prop="countryOfIncorporation">
+                <CountrySelect v-model="profile.countryOfIncorporation" />
               </el-form-item>
-              <el-form-item label="Postal Address" class="md:col-span-2">
-                <el-input v-model="profile.postalAddress" />
+            </template>
+            <template v-else>
+              <el-form-item label="First Name" prop="firstName">
+                <el-input v-model="profile.firstName" />
               </el-form-item>
-              <el-form-item label="Physical Address" class="md:col-span-2">
-                <el-input v-model="profile.physicalAddress" />
+              <el-form-item label="Surname" prop="surname">
+                <el-input v-model="profile.surname" />
               </el-form-item>
-              <el-form-item label="Business / Context Description" class="md:col-span-2">
-                <el-input v-model="profile.businessDescription" type="textarea" :rows="4" />
+              <el-form-item label="National ID / Passport" prop="nationalId">
+                <el-input v-model="profile.nationalId" />
               </el-form-item>
-
-              <div class="md:col-span-2">
-                <el-button type="primary" :loading="loading" @click="saveProfile">Save Profile</el-button>
-              </div>
-            </el-form>
+            </template>
           </div>
         </div>
-      </el-tab-pane>
+      </div>
 
-      <!-- ── Security Tab ───────────────────────────────────────── -->
-      <el-tab-pane label="Security" name="security">
-        <div class="pt-2">
-          <div class="rounded-2xl border border-slate-200 p-4">
-            <h3 class="text-lg font-semibold">Change Password</h3>
-            <el-form ref="passwordFormRef" class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2" label-position="top" :model="passwordForm" :rules="passwordRules">
-              <el-form-item label="Current Password" prop="currentPassword">
-                <el-input v-model="passwordForm.currentPassword" type="password" show-password />
+      <!-- ── Contact ── -->
+      <div class="set__row">
+        <div class="set__row-left">
+          <h4>Contact Information</h4>
+          <p>How FCC can reach you about your applications.</p>
+        </div>
+        <div class="set__row-right">
+          <div class="set__fields" :class="isFirmApplicant ? 'set__fields--3' : 'set__fields--2'">
+            <el-form-item label="Email" prop="email">
+              <el-input v-model="profile.email" />
+            </el-form-item>
+            <el-form-item label="Phone Number" prop="phoneNumber">
+              <el-input v-model="profile.phoneNumber" />
+            </el-form-item>
+            <template v-if="isFirmApplicant">
+              <el-form-item label="Contact Person" prop="contactPersonName">
+                <el-input v-model="profile.contactPersonName" />
               </el-form-item>
-              <div />
-              <el-form-item label="New Password" prop="newPassword">
-                <el-input v-model="passwordForm.newPassword" type="password" show-password />
+              <el-form-item label="Contact Email" prop="contactPersonEmail">
+                <el-input v-model="profile.contactPersonEmail" />
               </el-form-item>
-              <el-form-item label="Confirm New Password" prop="confirmPassword">
-                <el-input v-model="passwordForm.confirmPassword" type="password" show-password />
+              <el-form-item label="Contact Phone" prop="contactPersonPhone">
+                <el-input v-model="profile.contactPersonPhone" />
               </el-form-item>
-              <div class="md:col-span-2">
-                <el-button type="primary" :loading="passwordLoading" @click="updatePassword">Update Password</el-button>
-              </div>
-            </el-form>
+            </template>
           </div>
         </div>
-      </el-tab-pane>
+      </div>
 
-      <!-- ── Preferences Tab ────────────────────────────────────── -->
-      <el-tab-pane label="Preferences" name="preferences">
-        <div class="pt-2">
-          <div class="rounded-2xl border border-slate-200 p-4">
-            <h3 class="text-lg font-semibold">Preferences</h3>
-            <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-              <label class="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-sm">
-                <span>Email notifications</span>
-                <el-switch v-model="preferences.emailNotifications" />
-              </label>
-              <label class="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-sm dark:border-slate-700">
-                <span>Push notifications{{ !pushSupported ? ' (not supported)' : '' }}</span>
-                <el-switch v-model="pushEnabled" :disabled="!pushSupported" @change="togglePushNotifications" />
-              </label>
-              <label class="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-sm">
-                <span>Compact mode</span>
-                <el-switch v-model="preferences.compactMode" />
-              </label>
-              <div class="rounded-xl border border-slate-200 p-3 text-sm">
-                <p class="mb-2 font-medium">Preferred language</p>
-                <el-select v-model="preferences.preferredLanguage" class="w-full">
-                  <el-option label="English" value="en" />
-                  <el-option label="Swahili" value="sw" />
-                </el-select>
-              </div>
-            </div>
-            <div class="mt-4">
-              <el-button type="primary" plain @click="savePreferences">Save Preferences</el-button>
-            </div>
-          </div>
+      <!-- ── Address ── -->
+      <div class="set__row">
+        <div class="set__row-left">
+          <h4>Address</h4>
+          <p>Registered address for official correspondence.</p>
         </div>
-      </el-tab-pane>
-    </el-tabs>
+        <div class="set__row-right">
+          <div class="set__fields set__fields--2">
+            <el-form-item label="Postal Address">
+              <el-input v-model="profile.postalAddress" placeholder="P.O. Box..." />
+            </el-form-item>
+            <el-form-item label="Physical Address">
+              <el-input v-model="profile.physicalAddress" placeholder="Street, City, Region" />
+            </el-form-item>
+          </div>
+          <el-form-item label="Business Description" style="margin-top: 0.5rem">
+            <el-input v-model="profile.businessDescription" type="textarea" :rows="3" placeholder="Brief description of your business or context..." />
+          </el-form-item>
+          <el-button type="primary" :loading="loading" style="margin-top: 0.75rem" @click="saveProfile">Save Profile</el-button>
+        </div>
+      </div>
+    </el-form>
+
+    <!-- ── Notifications ── -->
+    <div class="set__row">
+      <div class="set__row-left">
+        <h4>Notifications</h4>
+        <p>Choose how you want to be notified.</p>
+      </div>
+      <div class="set__row-right">
+        <div class="set__toggles">
+          <label class="set__toggle">
+            <div>
+              <span class="set__toggle-name">Email Notifications</span>
+              <span class="set__toggle-hint">Status changes, payment confirmations</span>
+            </div>
+            <el-switch v-model="preferences.emailNotifications" />
+          </label>
+          <label class="set__toggle">
+            <div>
+              <span class="set__toggle-name">Push Notifications</span>
+              <span class="set__toggle-hint">{{ pushSupported ? 'Real-time browser alerts' : 'Not supported in this browser' }}</span>
+            </div>
+            <el-switch v-model="pushEnabled" :disabled="!pushSupported" @change="togglePushNotifications" />
+          </label>
+          <label class="set__toggle" style="border-bottom: none">
+            <div>
+              <span class="set__toggle-name">Compact Mode</span>
+              <span class="set__toggle-hint">Reduce spacing for denser display</span>
+            </div>
+            <el-switch v-model="preferences.compactMode" />
+          </label>
+        </div>
+        <div class="set__fields set__fields--2" style="margin-top: 0.75rem">
+          <el-form-item label="Preferred Language">
+            <el-select v-model="preferences.preferredLanguage" style="width: 100%">
+              <el-option label="English" value="en" />
+              <el-option label="Swahili" value="sw" />
+            </el-select>
+          </el-form-item>
+        </div>
+        <el-button type="primary" style="margin-top: 0.5rem" @click="savePreferences">Save Preferences</el-button>
+      </div>
+    </div>
+
+    <!-- ── Password ── -->
+    <el-form ref="passwordFormRef" label-position="top" :model="passwordForm" :rules="passwordRules">
+      <div class="set__row" style="border-bottom: none">
+        <div class="set__row-left">
+          <h4>Password</h4>
+          <p>Update your password to keep your account secure.</p>
+        </div>
+        <div class="set__row-right">
+          <el-form-item label="Current Password" prop="currentPassword">
+            <el-input v-model="passwordForm.currentPassword" type="password" show-password placeholder="Enter current password" />
+          </el-form-item>
+          <div class="set__fields set__fields--2" style="margin-top: 0.5rem">
+            <el-form-item label="New Password" prop="newPassword">
+              <el-input v-model="passwordForm.newPassword" type="password" show-password placeholder="At least 8 characters" />
+            </el-form-item>
+            <el-form-item label="Confirm Password" prop="confirmPassword">
+              <el-input v-model="passwordForm.confirmPassword" type="password" show-password placeholder="Re-enter new password" />
+            </el-form-item>
+          </div>
+          <el-button type="primary" :loading="passwordLoading" style="margin-top: 0.75rem" @click="updatePassword">Update Password</el-button>
+        </div>
+      </div>
+    </el-form>
   </section>
 </template>
+
+<style scoped>
+.set {
+  width: 100%;
+}
+
+.set__head {
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--fcc-border-light);
+  margin-bottom: 0;
+}
+
+.set__title {
+  margin: 0;
+  font-family: var(--fcc-font-heading);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--fcc-text-primary);
+}
+
+.set__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.84rem;
+  color: var(--fcc-text-muted);
+}
+
+/* ── Two-column row ── */
+.set__row {
+  display: flex;
+  gap: 2.5rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--fcc-border-light);
+}
+
+.set__row-left {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.set__row-left h4 {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--fcc-text-primary);
+}
+
+.set__row-left p {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--fcc-text-muted);
+  line-height: 1.45;
+}
+
+.set__row-right {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Fields grid ── */
+.set__fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.set__fields--3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* ── Photo upload ── */
+.set__photo-area {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 1.5rem;
+  border: 1.5px dashed var(--fcc-border);
+  border-radius: var(--fcc-radius-lg);
+  background: var(--fcc-bg-surface-muted);
+  cursor: pointer;
+  transition: border-color 150ms, background 150ms;
+  width: 100%;
+}
+
+.set__photo-area:hover {
+  border-color: var(--fcc-primary-400);
+  background: color-mix(in srgb, var(--fcc-primary-500) 3%, var(--fcc-bg-surface-muted));
+}
+
+.set__avatar {
+  flex-shrink: 0;
+  border: 3px solid var(--fcc-border);
+}
+
+.set__photo-cta {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--fcc-text-primary);
+}
+
+.set__photo-hint {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  color: var(--fcc-text-muted);
+}
+
+/* ── Toggle stack ── */
+.set__toggles {
+  border: 1px solid var(--fcc-border);
+  border-radius: var(--fcc-radius-lg);
+  overflow: hidden;
+}
+
+.set__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--fcc-border-light);
+  cursor: default;
+}
+
+.set__toggle-name {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--fcc-text-primary);
+}
+
+.set__toggle-hint {
+  display: block;
+  font-size: 0.72rem;
+  color: var(--fcc-text-muted);
+  margin-top: 1px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .set__row {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .set__row-left {
+    width: auto;
+  }
+
+  .set__fields,
+  .set__fields--3 {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

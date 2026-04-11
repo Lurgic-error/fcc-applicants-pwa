@@ -1,7 +1,9 @@
 <script setup>
 import { inject } from 'vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 import MergerAddressFields from '@/components/merger/MergerAddressFields.vue'
 import MergerArrayManager from '@/components/merger/MergerArrayManager.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { ENTITY_TYPES, ACQUISITION_TYPES, REL_BODY_TYPES, mk } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -27,11 +29,11 @@ function removeFirm(index) {
     <div v-for="(firm, i) in form.acquiringFirms" :key="i" class="merger-firm-card">
       <div class="merger-firm-card__head">
         <span class="merger-firm-card__title">Acquiring Firm #{{ i + 1 }}</span>
-        <el-button v-if="form.acquiringFirms.length > 1" type="danger" text size="small" @click="removeFirm(i)">Remove</el-button>
+        <el-button v-if="form.acquiringFirms.length > 1" type="danger" text @click="removeFirm(i)">Remove</el-button>
       </div>
       <div class="merger-firm-card__body space-y-5">
         <!-- Type & Acquisition -->
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <SmartFormGrid :max-cols="2">
           <el-form-item label="Entity Type" required>
             <el-select :model-value="firm.acquiringFirmType" @update:model-value="v => set(`acquiringFirms.${i}.acquiringFirmType`, v)" class="w-full" placeholder="Select...">
               <el-option v-for="o in ENTITY_TYPES" :key="o.value" :label="o.label" :value="o.value" />
@@ -42,11 +44,11 @@ function removeFirm(index) {
               <el-option v-for="o in ACQUISITION_TYPES" :key="o.value" :label="o.label" :value="o.value" />
             </el-select>
           </el-form-item>
-        </div>
+        </SmartFormGrid>
 
         <!-- Body Corporate -->
         <template v-if="firm.acquiringFirmType === 'bodyCorporate'">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <SmartFormGrid :max-cols="3">
             <el-form-item label="Company Name" required>
               <el-input :model-value="firm.bodyCorporateDetails.companyName" @update:model-value="v => set(`acquiringFirms.${i}.bodyCorporateDetails.companyName`, v)" />
             </el-form-item>
@@ -56,13 +58,13 @@ function removeFirm(index) {
             <el-form-item label="Place of Incorporation" required>
               <el-input :model-value="firm.bodyCorporateDetails.placeOfIncorporation" @update:model-value="v => set(`acquiringFirms.${i}.bodyCorporateDetails.placeOfIncorporation`, v)" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
           <MergerAddressFields :path="`acquiringFirms.${i}.bodyCorporateDetails.registeredOffice`" />
         </template>
 
         <!-- Individual -->
         <template v-if="firm.acquiringFirmType === 'individual'">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <SmartFormGrid :max-cols="3">
             <el-form-item label="Full Name" required>
               <el-input :model-value="firm.individualDetails.fullName" @update:model-value="v => set(`acquiringFirms.${i}.individualDetails.fullName`, v)" />
             </el-form-item>
@@ -70,7 +72,7 @@ function removeFirm(index) {
               <el-input :model-value="firm.individualDetails.nationalId" @update:model-value="v => set(`acquiringFirms.${i}.individualDetails.nationalId`, v)" />
             </el-form-item>
             <el-form-item label="Nationality">
-              <el-input :model-value="firm.individualDetails.nationality" @update:model-value="v => set(`acquiringFirms.${i}.individualDetails.nationality`, v)" />
+              <CountrySelect :model-value="firm.individualDetails.nationality" @update:model-value="v => set(`acquiringFirms.${i}.individualDetails.nationality`, v)" placeholder="Select nationality" />
             </el-form-item>
             <el-form-item label="Phone">
               <el-input :model-value="firm.individualDetails.phone" @update:model-value="v => set(`acquiringFirms.${i}.individualDetails.phone`, v)" />
@@ -78,12 +80,12 @@ function removeFirm(index) {
             <el-form-item label="Email">
               <el-input :model-value="firm.individualDetails.email" @update:model-value="v => set(`acquiringFirms.${i}.individualDetails.email`, v)" type="email" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </template>
 
         <!-- Shares detail -->
         <template v-if="firm.acquisitionDetails.acquisitionType === 'shares' || firm.acquisitionDetails.acquisitionType === 'sharesAndAssets'">
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-4">
+          <SmartFormGrid :max-cols="4">
             <el-form-item label="No. of Shares">
               <el-input-number :model-value="firm.acquisitionDetails.shares.numberOfShares" @update:model-value="v => set(`acquiringFirms.${i}.acquisitionDetails.shares.numberOfShares`, v)" :min="0" class="!w-full" />
             </el-form-item>
@@ -96,7 +98,7 @@ function removeFirm(index) {
             <el-form-item label="Description">
               <el-input :model-value="firm.acquisitionDetails.shares.description" @update:model-value="v => set(`acquiringFirms.${i}.acquisitionDetails.shares.description`, v)" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </template>
 
         <!-- Business Description -->
@@ -107,7 +109,7 @@ function removeFirm(index) {
         <!-- Shareholders -->
         <MergerArrayManager :path="`acquiringFirms.${i}.ownershipStructure.shareholders`" title="Shareholder" :factory="mk.shareholder">
           <template #default="{ item, path: itemPath }">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+            <SmartFormGrid :max-cols="4">
               <el-form-item label="Name">
                 <el-input :model-value="item.name" @update:model-value="v => set(`${itemPath}.name`, v)" />
               </el-form-item>
@@ -118,16 +120,16 @@ function removeFirm(index) {
                 <el-input :model-value="item.shareType" @update:model-value="v => set(`${itemPath}.shareType`, v)" placeholder="Ordinary" />
               </el-form-item>
               <el-form-item label="Nationality">
-                <el-input :model-value="item.nationality" @update:model-value="v => set(`${itemPath}.nationality`, v)" />
+                <CountrySelect :model-value="item.nationality" @update:model-value="v => set(`${itemPath}.nationality`, v)" placeholder="Select nationality" />
               </el-form-item>
-            </div>
+            </SmartFormGrid>
           </template>
         </MergerArrayManager>
 
         <!-- Related Bodies Corporate -->
         <MergerArrayManager :path="`acquiringFirms.${i}.relatedBodiesCorporate`" title="Related Body" :factory="mk.relBody">
           <template #default="{ item, path: itemPath }">
-            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <SmartFormGrid :max-cols="2">
               <el-form-item label="Name" required>
                 <el-input :model-value="item.name" @update:model-value="v => set(`${itemPath}.name`, v)" />
               </el-form-item>
@@ -142,10 +144,10 @@ function removeFirm(index) {
               <el-form-item label="Ownership %">
                 <el-input-number :model-value="item.ownershipPercentage" @update:model-value="v => set(`${itemPath}.ownershipPercentage`, v)" :min="0" :max="100" class="!w-full" />
               </el-form-item>
-              <el-form-item label="Principal Business" class="sm:col-span-2">
+              <el-form-item label="Principal Business" class="col-span-full">
                 <el-input :model-value="item.principalBusiness" @update:model-value="v => set(`${itemPath}.principalBusiness`, v)" />
               </el-form-item>
-            </div>
+            </SmartFormGrid>
           </template>
         </MergerArrayManager>
 
@@ -160,14 +162,14 @@ function removeFirm(index) {
           <el-checkbox :model-value="firm.beneficialOwner.hasBeneficialOwner" @update:model-value="v => set(`acquiringFirms.${i}.beneficialOwner.hasBeneficialOwner`, v)">
             1(e) — Shares/assets held for benefit of another person
           </el-checkbox>
-          <div v-if="firm.beneficialOwner.hasBeneficialOwner" class="grid grid-cols-1 gap-4 sm:grid-cols-2 mt-3">
+          <SmartFormGrid v-if="firm.beneficialOwner.hasBeneficialOwner" :max-cols="2" class="mt-3">
             <el-form-item label="Beneficial Owner Name">
               <el-input :model-value="firm.beneficialOwner.name" @update:model-value="v => set(`acquiringFirms.${i}.beneficialOwner.name`, v)" />
             </el-form-item>
             <el-form-item label="Relationship to Acquiring Firm">
               <el-input :model-value="firm.beneficialOwner.relationshipToAcquiringFirm" @update:model-value="v => set(`acquiringFirms.${i}.beneficialOwner.relationshipToAcquiringFirm`, v)" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </div>
       </div>
     </div>

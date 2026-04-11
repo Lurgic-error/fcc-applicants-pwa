@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 import MergerArrayManager from '@/components/merger/MergerArrayManager.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { mk } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -47,7 +48,7 @@ function arrayToCsv(arr) {
       <template #default="{ item, path: itemPath }">
         <div class="space-y-4">
           <!-- Market identity -->
-          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <SmartFormGrid :max-cols="2">
             <el-form-item label="Market Name" required>
               <el-input
                 :model-value="item.marketName"
@@ -64,7 +65,7 @@ function arrayToCsv(arr) {
                 <el-option v-for="o in MARKET_TYPES" :key="o.value" :label="o.label" :value="o.value" />
               </el-select>
             </el-form-item>
-          </div>
+          </SmartFormGrid>
 
           <!-- Product Dimension -->
           <div class="merger-dimension">
@@ -77,22 +78,22 @@ function arrayToCsv(arr) {
                 @update:model-value="v => set(`${itemPath}.productDimension.description`, v)"
               />
             </el-form-item>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <el-form-item label="Products (comma-separated)">
-                <el-input
-                  :model-value="arrayToCsv(item.productDimension.products)"
-                  @update:model-value="v => set(`${itemPath}.productDimension.products`, csvToArray(v))"
-                  placeholder="e.g. Cement, Steel, Glass"
+            <SmartFormGrid :max-cols="2">
+              <el-form-item label="Products">
+                <el-input-tag
+                  :model-value="item.productDimension.products || []"
+                  @update:model-value="v => set(`${itemPath}.productDimension.products`, v)"
+                  placeholder="Type and press Enter"
                 />
               </el-form-item>
-              <el-form-item label="Substitute Sources (comma-separated)">
-                <el-input
-                  :model-value="arrayToCsv(item.productDimension.substituteSources)"
-                  @update:model-value="v => set(`${itemPath}.productDimension.substituteSources`, csvToArray(v))"
-                  placeholder="e.g. Imports, Local competitors"
+              <el-form-item label="Substitute Sources">
+                <el-input-tag
+                  :model-value="item.productDimension.substituteSources || []"
+                  @update:model-value="v => set(`${itemPath}.productDimension.substituteSources`, v)"
+                  placeholder="Type and press Enter"
                 />
               </el-form-item>
-            </div>
+            </SmartFormGrid>
             <el-form-item label="Demand-Side Substitutability">
               <el-input
                 type="textarea"
@@ -122,22 +123,22 @@ function arrayToCsv(arr) {
                 @update:model-value="v => set(`${itemPath}.geographicDimension.description`, v)"
               />
             </el-form-item>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <el-form-item label="Areas (comma-separated)">
-                <el-input
-                  :model-value="arrayToCsv(item.geographicDimension.areas)"
-                  @update:model-value="v => set(`${itemPath}.geographicDimension.areas`, csvToArray(v))"
-                  placeholder="e.g. Dar es Salaam, Arusha, Mwanza"
+            <SmartFormGrid :max-cols="2">
+              <el-form-item label="Areas">
+                <el-input-tag
+                  :model-value="item.geographicDimension.areas || []"
+                  @update:model-value="v => set(`${itemPath}.geographicDimension.areas`, v)"
+                  placeholder="Type and press Enter"
                 />
               </el-form-item>
-              <el-form-item label="Customer Access Areas (comma-separated)">
-                <el-input
-                  :model-value="arrayToCsv(item.geographicDimension.customerAccessAreas)"
-                  @update:model-value="v => set(`${itemPath}.geographicDimension.customerAccessAreas`, csvToArray(v))"
-                  placeholder="e.g. East Africa, SADC"
+              <el-form-item label="Customer Access Areas">
+                <el-input-tag
+                  :model-value="item.geographicDimension.customerAccessAreas || []"
+                  @update:model-value="v => set(`${itemPath}.geographicDimension.customerAccessAreas`, v)"
+                  placeholder="Type and press Enter"
                 />
               </el-form-item>
-            </div>
+            </SmartFormGrid>
           </div>
 
           <!-- Functional Dimension -->
@@ -151,11 +152,11 @@ function arrayToCsv(arr) {
                 @update:model-value="v => set(`${itemPath}.functionalDimension.description`, v)"
               />
             </el-form-item>
-            <el-form-item label="Vertical Stages (comma-separated)">
-              <el-input
-                :model-value="arrayToCsv(item.functionalDimension.verticalStages)"
-                @update:model-value="v => set(`${itemPath}.functionalDimension.verticalStages`, csvToArray(v))"
-                placeholder="e.g. Manufacturing, Distribution, Retail"
+            <el-form-item label="Vertical Stages">
+              <el-input-tag
+                :model-value="item.functionalDimension.verticalStages || []"
+                @update:model-value="v => set(`${itemPath}.functionalDimension.verticalStages`, v)"
+                placeholder="Type and press Enter"
               />
             </el-form-item>
           </div>

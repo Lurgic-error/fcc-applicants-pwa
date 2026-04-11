@@ -402,13 +402,13 @@ onMounted(async () => {
           </dl>
 
           <div class="mt-3 flex flex-wrap gap-2">
-            <el-button size="small" :loading="paymentActionLoading" :disabled="!canGenerateControlNumber" @click="generateControlNumber">
+            <el-button :loading="paymentActionLoading" :disabled="!canGenerateControlNumber" @click="generateControlNumber">
               Generate Control Number
             </el-button>
-            <el-button size="small" type="success" :loading="paymentActionLoading" :disabled="!canConfirmPayment" @click="confirmPayment">
+            <el-button type="success" :loading="paymentActionLoading" :disabled="!canConfirmPayment" @click="confirmPayment">
               Payment Status
             </el-button>
-            <el-button size="small" type="primary" :loading="paymentActionLoading" :disabled="!canSubmitToFcc" @click="submitToFcc">
+            <el-button type="primary" :loading="paymentActionLoading" :disabled="!canSubmitToFcc" @click="submitToFcc">
               Submit to FCC
             </el-button>
           </div>
@@ -455,7 +455,7 @@ onMounted(async () => {
               <p v-if="cert.trademarkName" class="text-xs text-slate-500">Trademark: {{ cert.trademarkName }}</p>
               <p class="text-xs text-slate-500">Issued: {{ formatDate(cert.issuedAt || cert.createdAt) }}</p>
             </div>
-            <el-button type="primary" size="small" @click="downloadCertificate(cert)">
+            <el-button type="primary" @click="downloadCertificate(cert)">
               Download Certificate
             </el-button>
           </div>

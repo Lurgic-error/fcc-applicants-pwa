@@ -1,7 +1,9 @@
 <script setup>
 import { inject, watch } from 'vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 import MergerAddressFields from '@/components/merger/MergerAddressFields.vue'
 import MergerArrayManager from '@/components/merger/MergerArrayManager.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { ENTITY_TYPES, ACQUISITION_TYPES, REL_BODY_TYPES, mk } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -22,7 +24,7 @@ watch(
     <!-- Target Type & Jurisdiction -->
     <div>
       <h3 class="merger-subsection-title">Section 2 — Target Firm</h3>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <SmartFormGrid :max-cols="2">
         <el-form-item label="Target Type" required>
           <el-select
             :model-value="form.targetFirm.targetType"
@@ -43,7 +45,7 @@ watch(
             <el-radio :value="false">No</el-radio>
           </el-radio-group>
         </el-form-item>
-      </div>
+      </SmartFormGrid>
 
       <div v-if="form.targetFirm.isRegisteredInTanzania === false" class="merger-warning-box">
         The target firm is not registered in Tanzania. You will need to complete the
@@ -55,7 +57,7 @@ watch(
     <template v-if="form.targetFirm.targetType === 'bodyCorporate'">
       <div>
         <h3 class="merger-subsection-title">Body Corporate Details</h3>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <SmartFormGrid :max-cols="3">
           <el-form-item label="Company Name" required>
             <el-input
               :model-value="get('targetFirm.bodyCorporateDetails.name')"
@@ -78,7 +80,7 @@ watch(
               <el-option v-for="o in ACQUISITION_TYPES" :key="o.value" :label="o.label" :value="o.value" />
             </el-select>
           </el-form-item>
-        </div>
+        </SmartFormGrid>
 
         <h4 class="merger-field-group-title">Registered Office</h4>
         <MergerAddressFields path="targetFirm.bodyCorporateDetails.registeredOffice" />
@@ -97,7 +99,7 @@ watch(
       <!-- Issued Capital Details -->
       <div>
         <h3 class="merger-subsection-title">Issued Capital Details</h3>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <SmartFormGrid :max-cols="3">
           <el-form-item label="Total Amount">
             <el-input-number
               :model-value="get('targetFirm.issuedCapitalDetails.totalIssuedCapital.amount')"
@@ -121,7 +123,7 @@ watch(
               class="!w-full"
             />
           </el-form-item>
-        </div>
+        </SmartFormGrid>
       </div>
     </template>
 
@@ -129,7 +131,7 @@ watch(
     <template v-if="form.targetFirm.targetType === 'individual'">
       <div>
         <h3 class="merger-subsection-title">Individual Details</h3>
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <SmartFormGrid :max-cols="2">
           <el-form-item label="Full Name" required>
             <el-input
               :model-value="get('targetFirm.individualDetails.fullName')"
@@ -155,7 +157,7 @@ watch(
               type="email"
             />
           </el-form-item>
-        </div>
+        </SmartFormGrid>
 
         <h4 class="merger-field-group-title">Address</h4>
         <MergerAddressFields path="targetFirm.individualDetails.address" />
@@ -187,7 +189,7 @@ watch(
       <h3 class="merger-subsection-title">Ownership Structure</h3>
       <MergerArrayManager path="targetFirm.ownershipStructure.shareholders" title="Shareholder" :factory="mk.shareholder">
         <template #default="{ item, path: itemPath }">
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-4">
+          <SmartFormGrid :max-cols="4">
             <el-form-item label="Name">
               <el-input :model-value="item.name" @update:model-value="v => set(`${itemPath}.name`, v)" />
             </el-form-item>
@@ -202,9 +204,9 @@ watch(
               <el-input :model-value="item.shareType" @update:model-value="v => set(`${itemPath}.shareType`, v)" placeholder="Ordinary" />
             </el-form-item>
             <el-form-item label="Nationality">
-              <el-input :model-value="item.nationality" @update:model-value="v => set(`${itemPath}.nationality`, v)" />
+              <CountrySelect :model-value="item.nationality" @update:model-value="v => set(`${itemPath}.nationality`, v)" placeholder="Select nationality" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </template>
       </MergerArrayManager>
     </div>
@@ -214,7 +216,7 @@ watch(
       <h3 class="merger-subsection-title">Related Bodies Corporate</h3>
       <MergerArrayManager path="targetFirm.relatedBodiesCorporate" title="Related Body" :factory="mk.relBody">
         <template #default="{ item, path: itemPath }">
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <SmartFormGrid :max-cols="2">
             <el-form-item label="Name" required>
               <el-input :model-value="item.name" @update:model-value="v => set(`${itemPath}.name`, v)" />
             </el-form-item>
@@ -233,10 +235,10 @@ watch(
                 :min="0" :max="100" class="!w-full"
               />
             </el-form-item>
-            <el-form-item label="Principal Business" class="sm:col-span-2">
+            <el-form-item label="Principal Business" class="col-span-full">
               <el-input :model-value="item.principalBusiness" @update:model-value="v => set(`${itemPath}.principalBusiness`, v)" />
             </el-form-item>
-          </div>
+          </SmartFormGrid>
         </template>
       </MergerArrayManager>
     </div>

@@ -1,6 +1,7 @@
 <script setup>
 import { inject } from 'vue'
 import MergerArrayManager from '@/components/merger/MergerArrayManager.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import { NOTIFICATION_STATUSES, JURISDICTION_OUTCOMES, mk } from '@/constants/mergerFcc8Config'
 
 const get = inject('wizardGet')
@@ -93,7 +94,7 @@ const form = inject('wizardForm')
       <MergerArrayManager path="international.otherJurisdictionNotifications" title="Notification" :factory="mk.jurisdictionNotif">
         <template #default="{ item, path: itemPath }">
           <div class="space-y-4">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <SmartFormGrid :max-cols="2">
               <el-form-item label="Jurisdiction" required>
                 <el-input
                   :model-value="item.jurisdiction"
@@ -143,7 +144,7 @@ const form = inject('wizardForm')
                   <el-option v-for="o in JURISDICTION_OUTCOMES" :key="o.value" :label="o.label" :value="o.value" />
                 </el-select>
               </el-form-item>
-            </div>
+            </SmartFormGrid>
           </div>
         </template>
       </MergerArrayManager>

@@ -3,6 +3,7 @@ import { ElMessage } from 'element-plus'
 import { computed, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -102,7 +103,7 @@ const step2IndividualRules = computed(() => {
     idNumber: [{ required: true, message: 'ID number is required', trigger: 'blur' }],
     profession: [{ required: true, message: 'Profession or business type is required', trigger: 'change' }],
   }
-  if (form.nationality === 'Other') r.nationalityOther = [{ required: true, message: 'Please specify your nationality', trigger: 'blur' }]
+  // nationalityOther no longer needed — CountrySelect provides the full country list
   if (form.profession === 'other') r.professionOther = [{ required: true, message: 'Please specify your profession', trigger: 'blur' }]
   return r
 })
@@ -185,39 +186,65 @@ function prevStep() {
 
 // ── Submit ──
 function buildPayload() {
-  const fullName = `${form.firstName} ${form.surname}`.trim()
-  const username = (form.email.split('@')[0] || `${form.surname}_${Date.now()}`).replace(/[^a-zA-Z0-9_]/g, '_')
-  const payload = {
-    firstName: form.firstName,
-    surname: form.surname,
-    fullName,
+  const base = {
+    type: isOrg.value ? 'company' : 'individual',
     email: form.email,
     phoneNumber: form.phoneNumber,
     password: form.password,
-    username,
-    accountType: form.accountType,
+    region: isOrg.value ? form.orgRegion : form.region,
+    city: isOrg.value ? form.orgCity : form.city,
+    physicalAddress: isOrg.value ? form.orgAddress : '',
+    username: (form.email.split('@')[0] || `${form.surname}_${Date.now()}`).replace(/[^a-zA-Z0-9_]/g, '_'),
     attributes: {
       custom: {
-        accountType: form.accountType,
+        accountType: isOrg.value ? 'company' : 'individual',
         portal: 'fcc-applicants-pwa',
       },
     },
   }
+
   if (isOrg.value) {
-    payload.companyName = form.orgName
-    payload.attributes.custom.position = form.position
-    payload.attributes.custom.orgName = form.orgName
-    payload.attributes.custom.orgType = form.orgType === 'other' ? form.orgTypeOther : form.orgType
-    payload.attributes.custom.orgRegNumber = form.orgRegNumber
-    payload.attributes.custom.orgAddress = [form.orgAddress, form.orgCity, form.orgRegion].filter(Boolean).join(', ')
+    base.company = {
+      name: form.orgName,
+      registrationNumber: form.orgRegNumber,
+      orgType: form.orgType === 'other' ? form.orgTypeOther : form.orgType,
+      orgTypeOther: form.orgType === 'other' ? form.orgTypeOther : undefined,
+      countryOfIncorporation: form.orgRegion || 'Tanzania',
+      address: [form.orgAddress, form.orgCity, form.orgRegion].filter(Boolean).join(', '),
+    }
+    base.representative = {
+      firstName: form.firstName,
+      surname: form.surname,
+      position: form.position,
+      email: form.email,
+      phoneNumber: form.phoneNumber,
+    }
+    base.companyName = form.orgName
+    base.fullName = `${form.firstName} ${form.surname}`.trim()
+    base.firstName = form.firstName
+    base.surname = form.surname
   } else {
-    payload.attributes.custom.nationality = form.nationality === 'Other' ? form.nationalityOther : form.nationality
-    payload.attributes.custom.idType = form.idType
-    payload.attributes.custom.idNumber = form.idNumber
-    payload.attributes.custom.profession = form.profession === 'other' ? form.professionOther : form.profession
-    payload.attributes.custom.address = [form.city, form.region].filter(Boolean).join(', ')
+    base.individual = {
+      firstName: form.firstName,
+      surname: form.surname,
+      nationality: form.nationality === 'Other' ? form.nationalityOther : form.nationality,
+      idType: form.idType,
+      idNumber: form.idNumber,
+      profession: form.profession === 'other' ? form.professionOther : form.profession,
+      professionOther: form.profession === 'other' ? form.professionOther : undefined,
+    }
+    base.representative = {
+      firstName: form.firstName,
+      surname: form.surname,
+      email: form.email,
+      phoneNumber: form.phoneNumber,
+    }
+    base.fullName = `${form.firstName} ${form.surname}`.trim()
+    base.firstName = form.firstName
+    base.surname = form.surname
   }
-  return payload
+
+  return base
 }
 
 async function submit() {
@@ -340,7 +367,7 @@ watch(step, () => { formRef.value?.clearValidate() })
             <!-- Shared: name fields -->
             <div class="form-section">
               <p class="form-section__label"><i class="fa-regular fa-user" /> Your Name</p>
-              <div class="grid grid-cols-2 gap-4">
+              <div class="smart-grid">
                 <el-form-item label="First Name" prop="firstName">
                   <el-input v-model="form.firstName" size="large" placeholder="e.g., John" autocomplete="given-name" />
                 </el-form-item>
@@ -355,19 +382,9 @@ watch(step, () => { formRef.value?.clearValidate() })
               <div class="form-section">
                 <p class="form-section__label"><i class="fa-solid fa-id-card" /> Identification</p>
                 <el-form-item label="Nationality" prop="nationality">
-                  <el-select v-model="form.nationality" size="large" placeholder="Select nationality" filterable class="w-full">
-                    <el-option label="Tanzanian" value="Tanzanian" />
-                    <el-option label="Kenyan" value="Kenyan" />
-                    <el-option label="Ugandan" value="Ugandan" />
-                    <el-option label="Rwandan" value="Rwandan" />
-                    <el-option label="Burundian" value="Burundian" />
-                    <el-option label="Other" value="Other" />
-                  </el-select>
+                  <CountrySelect v-model="form.nationality" placeholder="Select nationality" />
                 </el-form-item>
-                <el-form-item v-if="form.nationality === 'Other'" label="Please specify your nationality" prop="nationalityOther">
-                  <el-input v-model="form.nationalityOther" size="large" placeholder="e.g., South African, Indian, British" />
-                </el-form-item>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="smart-grid">
                   <el-form-item label="ID Type" prop="idType">
                     <el-select v-model="form.idType" size="large" placeholder="Select type" class="w-full">
                       <el-option label="National ID (NIDA)" value="nida" />
@@ -414,7 +431,7 @@ watch(step, () => { formRef.value?.clearValidate() })
                 <el-form-item label="Organization Name" prop="orgName">
                   <el-input v-model="form.orgName" size="large" placeholder="e.g., ABC Law Firm, Vodacom Tanzania PLC" />
                 </el-form-item>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="smart-grid">
                   <el-form-item label="Organization Type" prop="orgType">
                     <el-select v-model="form.orgType" size="large" placeholder="Select type" class="w-full">
                       <el-option label="Law Firm" value="law_firm" />
@@ -465,7 +482,7 @@ watch(step, () => { formRef.value?.clearValidate() })
             <div class="form-section">
               <p class="form-section__label"><i class="fa-solid fa-location-dot" /> {{ isOrg ? 'Organization Address' : 'Physical Address' }}</p>
               <template v-if="isOrg">
-                <div class="grid grid-cols-2 gap-4">
+                <div class="smart-grid">
                   <el-form-item label="Region">
                     <el-select v-model="form.orgRegion" size="large" placeholder="Select region" filterable class="w-full">
                       <el-option v-for="r in regions" :key="r" :label="r" :value="r" />
@@ -480,7 +497,7 @@ watch(step, () => { formRef.value?.clearValidate() })
                 </el-form-item>
               </template>
               <template v-else>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="smart-grid">
                   <el-form-item label="Region">
                     <el-select v-model="form.region" size="large" placeholder="Select region" filterable class="w-full">
                       <el-option v-for="r in regions" :key="r" :label="r" :value="r" />
@@ -1030,6 +1047,6 @@ watch(step, () => { formRef.value?.clearValidate() })
 
 @media (max-width: 520px) {
   .type-cards { grid-template-columns: 1fr; }
-  .grid-cols-2 { grid-template-columns: 1fr; }
+  .smart-grid { grid-template-columns: 1fr; }
 }
 </style>

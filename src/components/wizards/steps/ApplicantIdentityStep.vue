@@ -1,5 +1,7 @@
 <script setup>
 import { computed } from 'vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 
 const props = defineProps({
   formData: { type: Object, default: () => ({}) },
@@ -25,7 +27,7 @@ function update(key, value) {
       />
     </el-form-item>
 
-    <div class="grid gap-4 md:grid-cols-2">
+    <SmartFormGrid :max-cols="2">
       <template v-if="isFirm">
         <el-form-item label="Company Name" required>
           <el-input :model-value="formData.companyName" @update:model-value="update('companyName', $event)" :disabled="disabled" />
@@ -34,7 +36,7 @@ function update(key, value) {
           <el-input :model-value="formData.registrationNumber" @update:model-value="update('registrationNumber', $event)" :disabled="disabled" />
         </el-form-item>
         <el-form-item label="Country of Incorporation">
-          <el-input :model-value="formData.countryOfIncorporation || 'Tanzania'" @update:model-value="update('countryOfIncorporation', $event)" :disabled="disabled" />
+          <CountrySelect :model-value="formData.countryOfIncorporation || 'Tanzania'" @update:model-value="update('countryOfIncorporation', $event)" :disabled="disabled" placeholder="Select country of incorporation" />
         </el-form-item>
         <el-form-item label="Contact Person Name" required>
           <el-input :model-value="formData.contactPersonName" @update:model-value="update('contactPersonName', $event)" :disabled="disabled" />
@@ -58,7 +60,7 @@ function update(key, value) {
           <el-input :model-value="formData.nationalId" @update:model-value="update('nationalId', $event)" :disabled="disabled" />
         </el-form-item>
         <el-form-item label="Country of Residence">
-          <el-input :model-value="formData.countryOfResidence || 'Tanzania'" @update:model-value="update('countryOfResidence', $event)" :disabled="disabled" />
+          <CountrySelect :model-value="formData.countryOfResidence || 'Tanzania'" @update:model-value="update('countryOfResidence', $event)" :disabled="disabled" placeholder="Select country of residence" />
         </el-form-item>
       </template>
 
@@ -68,15 +70,15 @@ function update(key, value) {
       <el-form-item label="Phone Number" required>
         <el-input :model-value="formData.phoneNumber" @update:model-value="update('phoneNumber', $event)" :disabled="disabled" />
       </el-form-item>
-      <el-form-item label="Postal Address" class="md:col-span-2">
+      <el-form-item label="Postal Address">
         <el-input :model-value="formData.postalAddress" @update:model-value="update('postalAddress', $event)" :disabled="disabled" />
       </el-form-item>
-      <el-form-item label="Physical Address" class="md:col-span-2">
+      <el-form-item label="Physical Address">
         <el-input :model-value="formData.physicalAddress" @update:model-value="update('physicalAddress', $event)" :disabled="disabled" />
       </el-form-item>
-      <el-form-item label="Business Description" class="md:col-span-2">
+      <el-form-item label="Business Description" class="col-span-full" full-width>
         <el-input type="textarea" :rows="3" :model-value="formData.businessDescription" @update:model-value="update('businessDescription', $event)" :disabled="disabled" />
       </el-form-item>
-    </div>
+    </SmartFormGrid>
   </div>
 </template>

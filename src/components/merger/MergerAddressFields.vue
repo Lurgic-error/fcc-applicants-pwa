@@ -3,18 +3,20 @@
  * Reusable address sub-form for FCC-8 merger wizard.
  * Renders street, city, region, postalCode, country fields in a responsive grid.
  */
+import { inject } from 'vue'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
+import CountrySelect from '@/components/forms/CountrySelect.vue'
+
 const props = defineProps({
   path: { type: String, required: true }
 })
 
 const get = inject('wizardGet')
 const set = inject('wizardSet')
-
-import { inject } from 'vue'
 </script>
 
 <template>
-  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+  <SmartFormGrid :max-cols="2">
     <el-form-item label="Street">
       <el-input :model-value="get(`${path}.street`)" @update:model-value="v => set(`${path}.street`, v)" placeholder="Street address" />
     </el-form-item>
@@ -28,7 +30,7 @@ import { inject } from 'vue'
       <el-input :model-value="get(`${path}.postalCode`)" @update:model-value="v => set(`${path}.postalCode`, v)" placeholder="Postal code" />
     </el-form-item>
     <el-form-item label="Country">
-      <el-input :model-value="get(`${path}.country`)" @update:model-value="v => set(`${path}.country`, v)" placeholder="Country" />
+      <CountrySelect :model-value="get(`${path}.country`)" @update:model-value="v => set(`${path}.country`, v)" />
     </el-form-item>
-  </div>
+  </SmartFormGrid>
 </template>

@@ -79,9 +79,38 @@
 :root {
   color-scheme: light;
   --app-text: #0f172a;
-  --app-radius-panel: 16px;
-  --app-radius-soft: 12px;
-  --app-radius-compact: 10px;
+
+  /* Portal-specific radius scale (4px base) — overrides shared tokens.css */
+  --fcc-radius-xs:    2px;
+  --fcc-radius-sm:    3px;
+  --fcc-radius-base:  4px;
+  --fcc-radius-md:    6px;
+  --fcc-radius-lg:    8px;
+  --fcc-radius-xl:    10px;
+  --fcc-radius-2xl:   12px;
+  --fcc-radius-card:  8px;
+  --fcc-radius-panel: 10px;
+  --fcc-radius-pill:  9999px;
+  --fcc-radius-full:  9999px;
+
+  /* Surface / border / text tokens (light) */
+  --fcc-bg-surface:       #ffffff;
+  --fcc-bg-surface-muted: #f8fafc;
+  --fcc-bg-elevated:      #ffffff;
+  --fcc-border:           #e2e8f0;
+  --fcc-border-light:     #f1f5f9;
+  --fcc-border-strong:    #cbd5e1;
+  --fcc-text-primary:     #0f172a;
+  --fcc-text-secondary:   #475569;
+  --fcc-text-muted:       #64748b;
+  --fcc-text-disabled:    #94a3b8;
+
+  /* Element Plus bridge — reference tokens */
+  --el-border-radius-base:  var(--fcc-radius-base);
+  --el-border-radius-small: var(--fcc-radius-sm);
+  --el-border-radius-round: var(--fcc-radius-base);
+  --el-tag-border-radius:   var(--fcc-radius-pill);
+
   --app-bg:
     radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.16), transparent 40%),
     radial-gradient(circle at 90% 0%, rgba(15, 76, 129, 0.18), transparent 45%),
@@ -96,6 +125,19 @@
   --app-surface-3: #1e293b;
   --app-border: #334155;
   --app-border-soft: #3f5170;
+
+  /* Surface / border / text tokens (dark) */
+  --fcc-bg-surface:       var(--app-surface-1);
+  --fcc-bg-surface-muted: var(--app-surface-2);
+  --fcc-bg-elevated:      var(--app-surface-3);
+  --fcc-border:           var(--app-border);
+  --fcc-border-light:     #1e293b;
+  --fcc-border-strong:    var(--app-border-soft);
+  --fcc-text-primary:     #e2e8f0;
+  --fcc-text-secondary:   #cbd5e1;
+  --fcc-text-muted:       #94a3b8;
+  --fcc-text-disabled:    #64748b;
+
   --app-bg:
     radial-gradient(circle at 10% 10%, rgba(14, 165, 233, 0.12), transparent 40%),
     radial-gradient(circle at 90% 0%, rgba(15, 76, 129, 0.2), transparent 45%),
@@ -145,36 +187,80 @@ body,
   min-height: 100vh;
 }
 
+/* ── Tailwind rounded-* class remapping (token-backed) ────────── */
+
 .rounded,
-.rounded-3xl,
-.rounded-2xl,
-.rounded-xl {
-  border-radius: var(--app-radius-panel) !important;
+.rounded-md {
+  border-radius: var(--fcc-radius-base) !important;
 }
 
-.rounded-sm,
-.rounded-lg,
-.rounded-md {
-  border-radius: var(--app-radius-soft) !important;
+.rounded-sm {
+  border-radius: var(--fcc-radius-sm) !important;
+}
+
+.rounded-lg {
+  border-radius: var(--fcc-radius-lg) !important;
+}
+
+.rounded-xl {
+  border-radius: var(--fcc-radius-xl) !important;
+}
+
+.rounded-2xl,
+.rounded-3xl {
+  border-radius: var(--fcc-radius-panel) !important;
 }
 
 .rounded-xs {
-  border-radius: var(--app-radius-compact) !important;
+  border-radius: var(--fcc-radius-xs) !important;
 }
 
-.el-button,
-.el-input__wrapper,
-.el-select__wrapper,
-.el-textarea__inner,
-.el-card,
-.el-dialog,
-.el-drawer,
-.el-table,
-.el-tag,
-.el-alert,
-.el-message-box,
-.el-descriptions {
-  border-radius: var(--app-radius-soft);
+/* ── Element Plus component radius enforcement (token-backed) ── */
+
+/* Base: buttons, inputs, selects */
+#app :where(.el-button):not(.is-circle) {
+  border-radius: var(--fcc-radius-base) !important;
+}
+#app :where(.el-button--small):not(.is-circle) {
+  border-radius: var(--fcc-radius-sm) !important;
+}
+#app :where(.el-input__wrapper),
+#app :where(.el-select__wrapper),
+#app :where(.el-textarea__inner),
+#app :where(.el-date-editor.el-input__wrapper),
+#app :where(.el-input-number) {
+  border-radius: var(--fcc-radius-base) !important;
+}
+#app :where(.el-alert),
+#app :where(.el-descriptions),
+#app :where(.el-dropdown-menu),
+#app :where(.el-select-dropdown) {
+  border-radius: var(--fcc-radius-lg) !important;
+}
+
+/* Cards: elevated containers */
+#app :where(.el-card),
+#app :where(.el-dialog),
+#app :where(.el-drawer),
+#app :where(.el-message-box),
+#app :where(.el-popover),
+#app :where(.el-notification) {
+  border-radius: var(--fcc-radius-panel) !important;
+}
+
+/* Tables */
+#app :where(.el-table) {
+  border-radius: var(--fcc-radius-lg) !important;
+}
+
+/* Tags: always pill */
+#app :where(.el-tag) {
+  border-radius: var(--fcc-radius-pill) !important;
+}
+
+/* Circles stay circular */
+#app :where(.el-button.is-circle) {
+  border-radius: 50% !important;
 }
 
 .el-dialog,
@@ -270,6 +356,36 @@ body,
 :root[data-theme='dark'] .el-radio__label,
 :root[data-theme='dark'] .el-checkbox__label {
   color: #cbd5e1;
+}
+
+/* ── Wizard declaration blocks: wrap safely inside cards ─────────────── */
+#app .wizard-declaration-box {
+  width: 100%;
+  min-width: 0;
+}
+
+#app .wizard-declaration-checkbox {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.625rem;
+  white-space: normal;
+}
+
+#app .wizard-declaration-checkbox .el-checkbox__input {
+  flex: 0 0 auto;
+  margin-top: 0.125rem;
+}
+
+#app .wizard-declaration-checkbox .el-checkbox__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-left: 0;
+  white-space: normal;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 :root[data-theme='dark'] .el-table,
@@ -397,4 +513,112 @@ h4,
 h5,
 h6 {
   font-family: 'Outfit', sans-serif;
+}
+
+/* ── Upload fields: always full width, full row ────────────────────── */
+#app .wizard-upload,
+#app .wizard-upload .el-upload,
+#app .wizard-upload .el-upload-dragger,
+#app .el-upload,
+#app .el-upload-dragger {
+  width: 100% !important;
+}
+
+#app .wizard-upload,
+#app .wizard-upload .el-upload {
+  display: block !important;
+}
+
+#app .wizard-upload .el-upload-dragger {
+  display: flex !important;
+  min-height: 176px;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+/* ── Date pickers: always full width ────────────────────────────────── */
+#app .el-date-editor.el-input,
+#app .el-date-editor.el-input__wrapper,
+#app .el-date-editor--date,
+#app .el-date-editor--datetime,
+#app .el-date-editor--daterange {
+  width: 100% !important;
+}
+
+/* ── Number inputs: full width + comma formatting via CSS ──────────── */
+#app .el-input-number {
+  width: 100% !important;
+}
+
+/* ── Form label enforcement: always on top ─────────────────────────── */
+#app .el-form-item {
+  display: flex;
+  flex-direction: column;
+}
+
+#app .el-form-item__label {
+  display: block;
+  text-align: left;
+  width: auto !important;
+  padding-right: 0;
+  padding-bottom: 4px;
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+#app .el-form-item__content {
+  margin-left: 0 !important;
+}
+
+/* ── Semantic token-backed utility classes ──────────────────────────── */
+.bg-fcc-surface       { background-color: var(--fcc-bg-surface); }
+.bg-fcc-surface-muted { background-color: var(--fcc-bg-surface-muted); }
+.bg-fcc-elevated      { background-color: var(--fcc-bg-elevated); }
+.border-fcc           { border-color: var(--fcc-border); }
+.border-fcc-light     { border-color: var(--fcc-border-light); }
+.border-fcc-strong    { border-color: var(--fcc-border-strong); }
+.text-fcc-primary     { color: var(--fcc-text-primary); }
+.text-fcc-secondary   { color: var(--fcc-text-secondary); }
+.text-fcc-muted       { color: var(--fcc-text-muted); }
+
+/* ── Smart form grid utilities ─────────────────────────────────────── */
+
+/* Textareas, uploads, and full-width items always span full row */
+.grid > .el-form-item:has(.el-textarea),
+.grid > .el-form-item:has(.el-upload),
+.grid > div:has(.el-textarea),
+.grid > div:has(.el-upload),
+.grid > .col-span-full,
+.grid > [full-width],
+.grid > [data-span="full"] {
+  grid-column: 1 / -1 !important;
+}
+
+/* Smart grid: auto-fit columns with min-width floor */
+.smart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 16px;
+}
+
+.smart-grid > :has(.el-textarea),
+.smart-grid > :has(.el-upload),
+.smart-grid > .col-span-full,
+.smart-grid > [full-width],
+.smart-grid > [data-span="full"] {
+  grid-column: 1 / -1 !important;
+}
+
+@media (max-width: 639px) {
+  .smart-grid,
+  .grid.grid-cols-2,
+  .grid.grid-cols-3,
+  .grid.grid-cols-4 {
+    grid-template-columns: 1fr !important;
+  }
+  .grid > *,
+  .smart-grid > * {
+    grid-column: auto !important;
+  }
 }

@@ -1,5 +1,6 @@
 <script setup>
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { UploadFilled } from '@element-plus/icons-vue'
 import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { onBeforeRouteLeave, useRoute, useRouter } from 'vue-router'
 import {
@@ -15,9 +16,12 @@ import {
 import { useApplicantDataStore } from '@/stores/applications'
 import { useAuthStore } from '@/stores/auth'
 import { useAutoSave } from '@/composables/useAutoSave'
+import SmartFormGrid from '@/components/forms/SmartFormGrid.vue'
 import ApplicantInfoStep from '@/components/wizards/ApplicantInfoStep.vue'
 import ApplicationFeeSummary from '@/components/wizards/ApplicationFeeSummary.vue'
 import GePGPaymentPanel from '@/components/forms/GePGPaymentPanel.vue'
+import WizardShell from './WizardShell.vue'
+import WizardSidebar from './WizardSidebar.vue'
 import {
   generateTrademarkControlNumber,
   verifyTrademarkPaymentByControlNumber
@@ -60,11 +64,14 @@ const isEditMode = computed(() => props.mode === 'update')
 const pageTitle = computed(() => `${isEditMode.value ? 'Update' : 'New'} ${service.value.label}`)
 
 const wizardSteps = [
-  { title: 'Applicant' },
-  { title: 'Legal Question' },
-  { title: 'Payment' },
-  { title: 'Review & Submit' }
+  { key: 'applicant', title: 'Applicant' },
+  { key: 'legal-question', title: 'Legal Question' },
+  { key: 'payment', title: 'Payment' },
+  { key: 'review', title: 'Review & Submit' }
 ]
+
+const sidebarSteps = computed(() => wizardSteps.map(s => ({ key: s.key, label: s.title })))
+const currentStepKey = computed(() => wizardSteps[stepIndex.value]?.key || '')
 
 const form = reactive({
   applicant: {
@@ -112,10 +119,10 @@ const payerName = computed(() => {
   return [form.applicant.firstName, form.applicant.surname].filter(Boolean).join(' ')
 })
 
-const { lastSaved, showResumePrompt, saveDraft, resumeDraft, discardDraft, clearDraft, checkForExistingDraft } = useAutoSave(
+const { lastSavedAt: lastSaved, hasDraft: showResumePrompt, save: saveDraft, restore: resumeDraft, clearDraft } = useAutoSave(
   `fcc_wizard_draft_${props.serviceKey}`,
-  () => ({ ...form }),
-  (data) => Object.assign(form, data)
+  { value: form },
+  { onRestore: (data) => Object.assign(form, data) }
 )
 
 const formSnapshot = ref('')
@@ -397,51 +404,79 @@ onMounted(async () => {
   }
 
   captureSnapshot()
-  if (!isEditMode.value) checkForExistingDraft()
+  if (!isEditMode.value) resumeDraft()
 })
 </script>
 
 <template>
-  <section>
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div>
-        <h2 class="text-2xl font-semibold">{{ pageTitle }}</h2>
-        <p class="mt-1 text-sm text-slate-600">
-          Complete the wizard to {{ isEditMode ? 'update' : 'submit' }} your legal opinion request.
-        </p>
-      </div>
-      <router-link :to="overviewRoute">
-        <el-button>Back to {{ service.label }}</el-button>
-      </router-link>
-    </div>
+  <WizardShell
+    :title="service.label"
+    :subtitle="isEditMode ? 'Edit Application' : 'New Application'"
+    :step-title="wizardSteps[stepIndex]?.title || ''"
+    :current-step-index="stepIndex"
+    :total-steps="wizardSteps.length"
+    :is-first-step="stepIndex === 0"
+    :is-last-step="stepIndex >= wizardSteps.length - 1"
+    :submitting="submitting"
+    :loading="loadingExisting"
+    :last-saved="lastSaved"
+    :back-route="overviewRoute"
+    :submit-label="isEditMode ? 'Save Updates' : 'Submit Application'"
+    @previous="previousStep"
+    @next="nextStep"
+    @submit="submit"
+    @save-draft="saveDraft"
+  >
+    <template #sidebar>
+      <WizardSidebar
+        :steps="sidebarSteps"
+        :current-step-key="currentStepKey"
+        @step-click="(key) => { stepIndex = wizardSteps.findIndex(s => s.key === key) }"
+      />
+    </template>
 
-    <el-steps :active="stepIndex" class="mt-6 hidden lg:flex">
-      <el-step v-for="step in wizardSteps" :key="step.title" :title="step.title" />
-    </el-steps>
+    <!-- Footer right: override to add declaration-gated submit -->
+    <template #footer-right>
+      <el-button type="info" plain @click="saveDraft">
+        Save Draft
+      </el-button>
+      <el-button
+        v-if="stepIndex < wizardSteps.length - 1"
+        type="primary"
+        @click="nextStep"
+      >
+        Next
+        <i class="fa-solid fa-chevron-right" style="margin-left: 6px" />
+      </el-button>
+      <el-button
+        v-else
+        type="primary"
+        :loading="submitting"
+        :disabled="!form.declaration.accepted"
+        @click="submit"
+      >
+        {{ isEditMode ? 'Save Updates' : 'Submit Application' }}
+      </el-button>
+    </template>
 
-    <div class="mt-4 flex items-center gap-2 text-sm text-slate-500 lg:hidden">
-      <span class="font-semibold text-slate-800">Step {{ stepIndex + 1 }}</span> of {{ wizardSteps.length }}: {{ wizardSteps[stepIndex]?.title }}
-    </div>
-
+    <!-- Default slot: sr-only heading, resume prompt, form content -->
     <h2 ref="stepHeadingRef" tabindex="-1" class="sr-only outline-none">
       Step {{ stepIndex + 1 }} of {{ wizardSteps.length }}: {{ wizardSteps[stepIndex]?.title }}
     </h2>
 
-    <div v-if="showResumePrompt" class="mt-4 rounded-2xl border border-blue-200 bg-blue-50 p-4">
-      <p class="text-sm font-medium text-blue-800">You have an unsaved draft. Resume?</p>
+    <div v-if="showResumePrompt" class="mb-4 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+      <p class="text-sm font-medium text-blue-800 dark:text-blue-200">You have an unsaved draft. Resume?</p>
       <div class="mt-3 flex gap-2">
-        <el-button type="primary" size="small" @click="resumeDraft">Resume Draft</el-button>
-        <el-button size="small" @click="discardDraft">Start Fresh</el-button>
+        <el-button type="primary" @click="resumeDraft">Resume Draft</el-button>
+        <el-button @click="clearDraft">Start Fresh</el-button>
       </div>
     </div>
 
     <el-form
       ref="formRef"
-      class="mt-5"
       label-position="top"
       :model="form"
       :rules="rules"
-      v-loading="loadingExisting"
     >
       <!-- Step 0: Applicant -->
       <template v-if="stepIndex === 0">
@@ -450,7 +485,7 @@ onMounted(async () => {
 
       <!-- Step 1: Legal Question -->
       <template v-if="stepIndex === 1">
-        <div class="grid grid-cols-1 gap-4">
+        <SmartFormGrid :max-cols="2">
           <el-form-item label="Subject Matter" prop="legalQuestion.subjectMatter">
             <el-input
               v-model="form.legalQuestion.subjectMatter"
@@ -483,20 +518,23 @@ onMounted(async () => {
             />
           </el-form-item>
 
-          <el-form-item label="Supporting Documents (PDF)">
+          <el-form-item label="Supporting Documents" class="col-span-full">
             <el-upload
+              class="wizard-upload"
               v-model:file-list="form.legalQuestion.attachments"
-              accept=".pdf"
+              accept=".pdf,.doc,.docx"
               :auto-upload="false"
               multiple
+              drag
             >
-              <el-button>Select PDF Files</el-button>
+              <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+              <div class="el-upload__text">Drop files here or <em>click to upload</em></div>
               <template #tip>
-                <div class="el-upload__tip">Only .pdf files are accepted</div>
+                <div class="el-upload__tip">PDF, DOC, DOCX files accepted</div>
               </template>
             </el-upload>
           </el-form-item>
-        </div>
+        </SmartFormGrid>
       </template>
 
       <!-- Step 2: Payment -->
@@ -516,41 +554,41 @@ onMounted(async () => {
       <!-- Step 3: Review & Submit -->
       <template v-if="stepIndex === 3">
         <div class="space-y-6">
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Applicant</h3>
-            <div class="grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Applicant</h3>
+            <SmartFormGrid :max-cols="2" gap="sm" class="text-sm">
               <template v-if="form.applicant.type === 'individual'">
-                <div><span class="text-slate-500">Name:</span> {{ form.applicant.firstName }} {{ form.applicant.surname }}</div>
-                <div><span class="text-slate-500">Email:</span> {{ form.applicant.email }}</div>
+                <div><span class="text-slate-500 dark:text-slate-400">Name:</span> {{ form.applicant.firstName }} {{ form.applicant.surname }}</div>
+                <div><span class="text-slate-500 dark:text-slate-400">Email:</span> {{ form.applicant.email }}</div>
               </template>
               <template v-else>
-                <div><span class="text-slate-500">Company:</span> {{ form.applicant.companyName }}</div>
-                <div><span class="text-slate-500">Email:</span> {{ form.applicant.email }}</div>
+                <div><span class="text-slate-500 dark:text-slate-400">Company:</span> {{ form.applicant.companyName }}</div>
+                <div><span class="text-slate-500 dark:text-slate-400">Email:</span> {{ form.applicant.email }}</div>
               </template>
-            </div>
+            </SmartFormGrid>
           </div>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600">Legal Question</h3>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-300">Legal Question</h3>
             <div class="grid grid-cols-1 gap-2 text-sm">
-              <div><span class="text-slate-500">Subject Matter:</span> {{ form.legalQuestion.subjectMatter || '—' }}</div>
+              <div><span class="text-slate-500 dark:text-slate-400">Subject Matter:</span> {{ form.legalQuestion.subjectMatter || '—' }}</div>
               <div class="mt-1">
-                <span class="text-slate-500">Question:</span>
+                <span class="text-slate-500 dark:text-slate-400">Question:</span>
                 <p class="mt-0.5 text-slate-800">{{ form.legalQuestion.legalQuestion || '—' }}</p>
               </div>
               <div v-if="form.legalQuestion.applicableLaws">
-                <span class="text-slate-500">Applicable Laws:</span> {{ form.legalQuestion.applicableLaws }}
+                <span class="text-slate-500 dark:text-slate-400">Applicable Laws:</span> {{ form.legalQuestion.applicableLaws }}
               </div>
             </div>
           </div>
 
           <ApplicationFeeSummary :items="feeItems" currency="TZS" />
 
-          <div class="rounded-xl border border-slate-200 bg-white p-4">
-            <el-checkbox v-model="form.declaration.accepted">
+          <div class="rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-800">
+            <el-checkbox v-model="form.declaration.accepted" class="wizard-declaration-checkbox">
               I declare that the information provided is accurate and complete to the best of my knowledge.
             </el-checkbox>
-            <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <SmartFormGrid :max-cols="3" gap="sm" class="mt-3">
               <el-form-item label="Full Name">
                 <el-input v-model="form.declaration.name" placeholder="Signatory full name" />
               </el-form-item>
@@ -560,27 +598,10 @@ onMounted(async () => {
               <el-form-item label="Date">
                 <el-date-picker v-model="form.declaration.date" type="date" value-format="YYYY-MM-DD" />
               </el-form-item>
-            </div>
+            </SmartFormGrid>
           </div>
         </div>
       </template>
     </el-form>
-
-    <div class="mt-4 flex items-center gap-2">
-      <el-button v-if="stepIndex > 0" @click="previousStep">Previous</el-button>
-      <el-button v-if="stepIndex < wizardSteps.length - 1" type="primary" @click="nextStep">Next</el-button>
-      <el-button
-        v-else
-        type="primary"
-        :loading="submitting"
-        :disabled="!form.declaration.accepted"
-        @click="submit"
-      >
-        {{ isEditMode ? 'Save Updates' : 'Submit Application' }}
-      </el-button>
-      <span v-if="lastSaved" class="text-xs text-slate-400">
-        Draft saved {{ new Date(lastSaved).toLocaleTimeString() }}
-      </span>
-    </div>
-  </section>
+  </WizardShell>
 </template>

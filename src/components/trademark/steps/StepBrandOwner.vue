@@ -8,10 +8,7 @@ const form = inject('wizardForm')
 <template>
   <div class="space-y-4">
     <div>
-      <h3 class="wizard-step__title">Brand Owner</h3>
-      <p class="wizard-step__description">
         Provide details about the registered owner of the trademark.
-      </p>
     </div>
 
     <el-form label-position="top">

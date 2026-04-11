@@ -44,6 +44,31 @@ export const useAuthStore = defineStore('applicant-auth', {
       state.profile?.attributes?.custom?.companyName ||
       state.user?.companyName ||
       null,
+    applicantType: (state) => {
+      return state.profile?.applicant?.type ||
+        state.profile?.applicantType ||
+        state.user?.attributes?.custom?.accountType ||
+        null
+    },
+    isCompanyApplicant() { return this.applicantType === 'company' },
+    isIndividualApplicant() { return this.applicantType === 'individual' || this.applicantType === null },
+    displayName: (state) => {
+      const a = state.profile?.applicant
+      if (!a) return state.profile?.fullName || state.user?.fullName || 'Applicant'
+      if (a.type === 'company') {
+        return a.company?.name || a.companyName || 'Company'
+      }
+      const first = a.individual?.firstName || a.firstName || ''
+      const last = a.individual?.surname || a.surname || ''
+      return `${first} ${last}`.trim() || state.profile?.fullName || 'Applicant'
+    },
+    representativeName: (state) => {
+      const r = state.profile?.applicant?.representative
+      if (r?.firstName) return `${r.firstName} ${r.surname || ''}`.trim()
+      const cp = state.profile?.applicant?.contactPerson
+      if (cp?.name) return cp.name
+      return state.profile?.fullName || state.user?.fullName || ''
+    },
     hasApplicantPortalAccess: (state) =>
       Boolean(state.token) && (state.accountType === 'applicant' || state.roles.includes('applicant'))
   },

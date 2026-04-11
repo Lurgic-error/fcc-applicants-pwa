@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick, onBeforeUnmount } from 'vue'
 import { ElMessage } from 'element-plus'
+import { UploadFilled } from '@element-plus/icons-vue'
 
 const props = defineProps({
   accept: { type: String, default: '.pdf,.doc,.docx,.jpg,.jpeg,.png' },
@@ -9,8 +10,8 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['files-selected'])
-const isDragging = ref(false)
-const fileInputRef = ref(null)
+const uploadRef = ref(null)
+let emitTimer = null
 
 function validateFiles(files) {
   const maxBytes = props.maxSizeMb * 1024 * 1024
@@ -22,56 +23,67 @@ function validateFiles(files) {
     }
     valid.push(file)
   }
-  return valid
+  return props.multiple ? valid : valid.slice(0, 1)
 }
 
-function handleDrop(event) {
-  isDragging.value = false
-  const files = validateFiles(Array.from(event.dataTransfer?.files || []))
-  if (files.length) emit('files-selected', props.multiple ? files : [files[0]])
+function clearSelection() {
+  nextTick(() => uploadRef.value?.clearFiles())
 }
 
-function handleFileInput(event) {
-  const files = validateFiles(Array.from(event.target?.files || []))
-  if (files.length) emit('files-selected', props.multiple ? files : [files[0]])
-  if (fileInputRef.value) fileInputRef.value.value = ''
+function handleChange(_, uploadFiles) {
+  const files = validateFiles(uploadFiles.map((file) => file.raw).filter(Boolean))
+  if (emitTimer) clearTimeout(emitTimer)
+  emitTimer = setTimeout(() => {
+    if (files.length) {
+      emit('files-selected', files)
+    }
+    clearSelection()
+  }, 0)
 }
 
-function openFilePicker() {
-  fileInputRef.value?.click()
+function handleExceed() {
+  if (!props.multiple) {
+    ElMessage.warning('Only one file can be selected here.')
+  }
 }
+
+onBeforeUnmount(() => {
+  if (emitTimer) clearTimeout(emitTimer)
+})
 </script>
 
 <template>
-  <div
-    class="relative cursor-pointer rounded-2xl border-2 border-dashed p-6 text-center transition-colors"
-    :class="isDragging
-      ? 'border-fcc-brand bg-fcc-brand/5 dark:bg-fcc-brand/10'
-      : 'border-slate-300 hover:border-fcc-brand/50 dark:border-slate-600 dark:hover:border-fcc-brand/50'"
-    @dragenter.prevent="isDragging = true"
-    @dragover.prevent="isDragging = true"
-    @dragleave.prevent="isDragging = false"
-    @drop.prevent="handleDrop"
-    @click="openFilePicker"
+  <el-upload
+    ref="uploadRef"
+    class="file-drop-zone wizard-upload"
+    drag
+    :accept="accept"
+    :multiple="multiple"
+    :limit="multiple ? 99 : 1"
+    :auto-upload="false"
+    :show-file-list="false"
+    :on-change="handleChange"
+    :on-exceed="handleExceed"
   >
-    <input
-      ref="fileInputRef"
-      type="file"
-      :accept="accept"
-      :multiple="multiple"
-      class="hidden"
-      @change="handleFileInput"
-    />
-    <div class="flex flex-col items-center gap-2">
-      <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-        <i class="fa-solid fa-cloud-arrow-up text-xl text-slate-400" />
-      </div>
-      <p class="text-sm font-medium text-slate-700 dark:text-slate-200">
-        {{ isDragging ? 'Drop files here' : 'Drag & drop files or click to browse' }}
-      </p>
-      <p class="text-xs text-slate-500 dark:text-slate-400">
-        Max {{ maxSizeMb }}MB per file
-      </p>
-    </div>
-  </div>
+    <el-icon class="el-icon--upload"><UploadFilled /></el-icon>
+    <div class="el-upload__text">Drop files here or <em>click to upload</em></div>
+    <template #tip>
+      <div class="el-upload__tip">Max {{ maxSizeMb }}MB per file</div>
+    </template>
+  </el-upload>
 </template>
+
+<style scoped>
+.file-drop-zone {
+  width: 100%;
+}
+
+.file-drop-zone :deep(.el-upload),
+.file-drop-zone :deep(.el-upload-dragger) {
+  width: 100%;
+}
+
+.file-drop-zone :deep(.el-upload-dragger) {
+  min-height: 176px;
+}
+</style>

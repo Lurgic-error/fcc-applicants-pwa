@@ -44,6 +44,7 @@ const stepComponents = {
   counterfactual: defineAsyncComponent(() => import('@/components/merger/steps/StepStructured.vue')),
   international: defineAsyncComponent(() => import('@/components/merger/steps/StepInternational.vue')),
   attachments: defineAsyncComponent(() => import('@/components/merger/steps/StepStructured.vue')),
+  mergerFees: defineAsyncComponent(() => import('@/components/merger/steps/StepMergerFees.vue')),
   undertaking: defineAsyncComponent(() => import('@/components/merger/steps/StepStructured.vue')),
   review: defineAsyncComponent(() => import('@/components/merger/steps/StepReview.vue'))
 }
@@ -56,10 +57,10 @@ const currentStep = ref(0)
 const stepHeadingRef = ref(null)
 const contentRef = ref(null)
 
-const { lastSaved, showResumePrompt, saveDraft, resumeDraft, discardDraft, clearDraft, checkForExistingDraft } = useAutoSave(
+const { lastSavedAt: lastSaved, hasDraft: showResumePrompt, save: saveDraft, restore: resumeDraft, clearDraft } = useAutoSave(
   'fcc_wizard_draft_merger-clearance',
-  () => toPlain(),
-  (data) => Object.assign(form, data)
+  { value: form },
+  { onRestore: (data) => Object.assign(form, data) }
 )
 
 watch(currentStep, () => {
@@ -180,7 +181,7 @@ onBeforeRouteLeave(async () => {
 
 onMounted(() => {
   captureSnapshot()
-  checkForExistingDraft()
+  resumeDraft()
 })
 </script>
 
@@ -190,7 +191,6 @@ onMounted(() => {
     <header class="merger-wizard__header">
       <div>
         <h1 class="merger-wizard__title">FCC-8 Merger Notification</h1>
-        <p class="merger-wizard__subtitle">Application for Merger Clearance — Rule 33(2)</p>
       </div>
       <div class="merger-wizard__header-actions">
         <el-button plain @click="saveManualDraft">Save Draft</el-button>
@@ -214,8 +214,8 @@ onMounted(() => {
             You have an unsaved draft from a previous session. Would you like to resume?
           </p>
           <div class="mt-3 flex gap-2">
-            <el-button type="primary" size="small" @click="resumeDraft">Resume Draft</el-button>
-            <el-button size="small" @click="discardDraft">Start Fresh</el-button>
+            <el-button type="primary" @click="resumeDraft">Resume Draft</el-button>
+            <el-button @click="clearDraft">Start Fresh</el-button>
           </div>
         </div>
 
@@ -274,9 +274,17 @@ onMounted(() => {
 .merger-wizard {
   display: flex;
   flex-direction: column;
-  height: 100vh;
   overflow: hidden;
   background: var(--fcc-bg-app, #f4f7fb);
+  margin: -1rem -1rem -1.5rem;
+  height: calc(100% + 1rem + 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .merger-wizard {
+    margin: -1.5rem;
+    height: calc(100% + 3rem);
+  }
 }
 
 .merger-wizard__header {
@@ -318,12 +326,10 @@ onMounted(() => {
 .merger-wizard__content {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem 2rem 6rem;
+  padding: 1.5rem 2rem 1.5rem;
 }
 
 .merger-wizard__card {
-  max-width: 54rem;
-  margin: 0 auto;
   background: var(--fcc-bg-surface, #fff);
   border: 1px solid var(--fcc-border, #dbe3ef);
   border-radius: var(--fcc-radius-panel, 12px);
@@ -392,5 +398,27 @@ onMounted(() => {
   .merger-wizard__card {
     padding: 1.25rem;
   }
+}
+
+/* ── Scrollbar ── */
+.merger-wizard__content::-webkit-scrollbar,
+.wizard-sidebar__nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.merger-wizard__content::-webkit-scrollbar-track,
+.wizard-sidebar__nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.merger-wizard__content::-webkit-scrollbar-thumb,
+.wizard-sidebar__nav::-webkit-scrollbar-thumb {
+  background: var(--fcc-border);
+  border-radius: 3px;
+}
+
+.merger-wizard__content::-webkit-scrollbar-thumb:hover,
+.wizard-sidebar__nav::-webkit-scrollbar-thumb:hover {
+  background: var(--fcc-border-strong);
 }
 </style>

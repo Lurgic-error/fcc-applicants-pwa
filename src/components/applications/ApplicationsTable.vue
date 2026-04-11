@@ -243,7 +243,7 @@ watch(totalItems, (count) => {
       </el-input>
       <span class="text-sm text-slate-500 dark:text-slate-400">{{ totalItems }} results</span>
       <el-dropdown trigger="click" @command="handleExport">
-        <el-button plain size="small">
+        <el-button plain>
           <i class="fa-solid fa-download mr-2" />Export
         </el-button>
         <template #dropdown>
@@ -367,11 +367,11 @@ watch(totalItems, (count) => {
         </div>
 
         <div class="mt-4 flex flex-wrap gap-2">
-          <el-button plain size="small" @click="emit('open', app)">Open</el-button>
+          <el-button plain @click="emit('open', app)">Open</el-button>
           <el-button
             type="primary"
             plain
-            size="small"
+           
             :disabled="app.journey && !app.journey.canEdit"
             @click="emit('edit', app)"
           >
